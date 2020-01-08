@@ -1,0 +1,496 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  
+  "http://www.w3.org/TR/html4/loose.dtd">  
+<html > 
+<head><title>UCI AP Controller Project Proposal</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+<meta name="generator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<meta name="originator" content="TeX4ht (http://www.tug.org/tex4ht/)"> 
+<!-- html --> 
+<meta name="src" content="Project_Proposal.tex"> 
+<link rel="stylesheet" type="text/css" href="Project_Proposal.css"> 
+</head><body 
+>
+   <div class="maketitle">
+
+
+
+<h2 class="titleHead">UCI AP Controller Project Proposal</h2>
+ <div class="author" ><span 
+class="cmr-12">Mike Sutherland</span></div><br />
+<div class="date" ><span 
+class="cmr-12">January 7, 2020</span></div>
+   </div> <div 
+class="abstract" 
+>
+<div class="center" 
+>
+<!--l. 23--><p class="noindent" >
+<!--l. 23--><p class="noindent" ><span 
+class="cmbx-9">Summary</span></div>
+     <!--l. 24--><p class="indent" >    <span 
+class="cmr-9">An automatic insulin dosing mechanism composed of an insulin pump,</span>
+     <span 
+class="cmr-9">continuous  glucose  monitor  (CGM),  and  dose  controller,  is  close  to  a</span>
+     <span 
+class="cmr-9">mechanical cure for Type 1 diabetes. The dose controller is an integral</span>
+     <span 
+class="cmr-9">part  of  the  system,  and  can  be  designed  using  a  range  of  techniques</span>
+     <span 
+class="cmr-9">from the field of control systems engineering. The AP controller project</span>
+     <span 
+class="cmr-9">proposed here would be to research, design, and test dose controllers on</span>
+     <span 
+class="cmr-9">virtual patients. If software testing is successful, the controller can be</span>
+     <span 
+class="cmr-9">implemented cheaply in hardware as a proof of concept.</span>
+</div>
+   <h3 class="sectionHead"><span class="titlemark">1   </span> <a 
+ id="x1-10001"></a>Background</h3>
+<!--l. 27--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">1.1   </span> <a 
+ id="x1-20001.1"></a>Type 1 Diabetes</h4>
+<!--l. 28--><p class="noindent" >Type 1 diabetes is an autoimmune disease which causes the destruction of insulin
+producing cells in the body. In healthy people, these insulin-producing cells regulate
+blood glucose levels. People with type 1 diabetes must manually regulate their blood
+glucose level. Variations in blood glucose result in a variety of adverse physical and
+mental effects; management of blood glucose is therefore the principal challenge of
+type 1 diabetes.
+
+<!--l. 29--><p class="indent" >   Continuous glucose monitors (CGMs) have enabled automated, high frequency,
+real-time readings of blood glucose levels. To dose insulin, people with type 1
+diabetes use either imprecise manual injections via syringe, or precise dosing via
+insulin pump. Dosing insulin to regulate blood glucose levels is currently a manual
+process.
+   <h4 class="subsectionHead"><span class="titlemark">1.2   </span> <a 
+ id="x1-30001.2"></a>Closed Loop Systems</h4>
+<!--l. 31--><p class="noindent" >The combination of a CGM, an insulin pump, and an automated dose controller is
+known as a &#8221;Closed Loop System.&#8221; Such systems have historically been limited by
+the imprecision of blood glucose measurement, but they are increasingly viable as
+sensor technology improves. The logic of the automated dose controller is often
+referred to as an AP or AP controller, standing for artificial pancreas.
+<!--l. 32--><p class="indent" >   The sensors, infusion sites, and devices required for a closed-loop system are
+inconvenient, but they enable a functional cure not yet available through biological
+methods.
+   <h3 class="sectionHead"><span class="titlemark">2   </span> <a 
+ id="x1-40002"></a>Project Goal</h3>
+<!--l. 34--><p class="noindent" >The AP Controller project is to implement and test one or more viable insulin dose
+controller schemes, which would robustly manage blood glucose under a wide variety
+of intrinsic and external conditions. Intrinsic conditions are differences in insulin
+resistance and glucose response between patients. External conditions are manual
+dosing, arbitrary glucose variations caused by meals or exercise, and missed or
+miscalibrated sensor readings.
+   <h4 class="subsectionHead"><span class="titlemark">2.1   </span> <a 
+ id="x1-50002.1"></a>Project Phases</h4>
+<!--l. 36--><p class="noindent" >The project will be split into three phases. The first phase will be to implement the
+software patients and a set of comprehensive tests, from which the performance of
+the control schemes can be compared. The second phase will be to implement and
+test control schemes in software. The third phase will be to implement the control
+schemes into hardware. A summary of the higher-order goals is shown in
+table&#x00A0;1.
+   <div class="table">
+
+<!--l. 40--><p class="indent" >   <a 
+ id="x1-50011"></a><hr class="float"><div class="float" 
+>
+
+<dl class="list1"><dt class="list">
+</dt><dd 
+class="list">
+<!--l. 41--><p class="noindent" >
+<br /><div class="caption" 
+><span class="id">Table&#x00A0;1: </span><span  
+class="content">Project Phases</span></div><!--tex4ht:label?: x1-50011 -->
+
+<table id="TBL-4" class="tabular" 
+cellspacing="0" cellpadding="0"  
+><colgroup id="TBL-4-1g"><col 
+id="TBL-4-1"><col 
+id="TBL-4-2"><col 
+id="TBL-4-3"></colgroup><tr  
+ style="vertical-align:baseline;" id="TBL-4-1-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-1-1"  
+class="td11"> Phase         </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-1-2"  
+class="td11"> <!--l. 76--><p class="noindent" >Goal                                                                        </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-1-3"  
+class="td11"> <!--l. 76--><p class="noindent" >Category              </td>
+
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-2-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-2-1"  
+class="td11"> Preliminary  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-3-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-3-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-3-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Faculty advisor recruitment                                   </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-3-3"  
+class="td11"> <!--l. 76--><p class="noindent" >admin                  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-4-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-4-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-4-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Student recruitment                                             </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-4-3"  
+class="td11"> <!--l. 76--><p class="noindent" >admin                  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-5-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-5-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-5-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Finalized Winter &#8217;20 Roadmap                               </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-5-3"  
+class="td11"> <!--l. 76--><p class="noindent" >admin                  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-6-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-6-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-6-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;<span 
+class="cmbx-10">Product:  Project  Proposal  and  Winter  &#8217;19</span>
+  <span 
+class="cmbx-10">roadmap</span>                                                        </td>
+
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-7-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-7-1"  
+class="td11"> Phase 1       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-8-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-8-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-8-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Implement   &#8221;no   controller&#8221;   test   case   in   patient
+  simulator                                                                  </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-8-3"  
+class="td11"> <!--l. 76--><p class="noindent" >software               </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-9-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-9-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-9-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Implement benchmarks for control schemes               </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-9-3"  
+class="td11"> <!--l. 76--><p class="noindent" >software, bio-eng    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-10-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-10-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-10-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;<span 
+class="cmbx-10">Product: Phase 1 Design Report</span>                   </td>
+
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-11-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-11-1"  
+class="td11"> Phase 2       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-12-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-12-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-12-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Review literature re: control schemes                       </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-12-3"  
+class="td11"> <!--l. 76--><p class="noindent" >control, bio-eng     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-13-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-13-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-13-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Implement control scheme                                     </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-13-3"  
+class="td11"> <!--l. 76--><p class="noindent" >software               </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-14-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-14-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-14-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Benchmark and compare control scheme(s)               </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-14-3"  
+class="td11"> <!--l. 76--><p class="noindent" >control, bio-eng     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-15-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-15-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-15-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Alter control schemes, test                                     </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-15-3"  
+class="td11"> <!--l. 76--><p class="noindent" >control, bio-eng     </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-16-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-16-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-16-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Fundraising for hardware                                       </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-16-3"  
+class="td11"> <!--l. 76--><p class="noindent" >admin                  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-17-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-17-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-17-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;<span 
+class="cmbx-10">Product: Phase 2 Design report</span>                     </td>
+
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-18-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-18-1"  
+class="td11"> Phase 3       </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-19-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-19-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-19-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Obtain hardware                                                 </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-19-3"  
+class="td11"> <!--l. 76--><p class="noindent" >admin                  </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-20-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-20-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-20-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Develop hardware testing (response simulated)          </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-20-3"  
+class="td11"> <!--l. 76--><p class="noindent" >hardware              </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-21-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-21-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-21-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Port control scheme(s) to hardware                         </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-21-3"  
+class="td11"> <!--l. 76--><p class="noindent" >software               </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-22-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-22-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-22-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;Test control schemes in hardware                            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-22-3"  
+class="td11"> <!--l. 76--><p class="noindent" >control, software    </td>
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-23-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-23-1"  
+class="td11">            </td><td  style="white-space:wrap; text-align:left;" id="TBL-4-23-2"  
+class="td11"> <!--l. 76--><p class="noindent" >&#x00A0;&#x00A0;<span 
+class="cmsy-10">&#x2219;</span>&#x00A0;&#x00A0;<span 
+class="cmbx-10">Product: Phase 3 Design Report</span>                   </td>
+
+</tr><tr  
+ style="vertical-align:baseline;" id="TBL-4-24-"><td  style="white-space:nowrap; text-align:left;" id="TBL-4-24-1"  
+class="td11">            </td></tr></table></dd></dl>
+
+   </div><hr class="endfloat" />
+   </div>
+<!--l. 80--><p class="indent" >   The number of students in the project will determine the timeline of these phases.
+With just one student: phase 1 could be completed by mid-winter 2020; phase 2
+by mid-spring 2020; and the final phase by end of spring into summer of
+2020.
+<!--l. 81--><p class="indent" >   Additional students with additional skills would help not only accelerate the
+timeline but also expand its scope. More models could be compared and more
+robustly tested. Once the test apparatus is in place, the work could be made parallel
+&#8211; each student could implement their own controller, and then those controllers could
+be tested against one another.
+   <h3 class="sectionHead"><span class="titlemark">3   </span> <a 
+ id="x1-60003"></a>Approach</h3>
+<!--l. 83--><p class="noindent" >
+   <h4 class="subsectionHead"><span class="titlemark">3.1   </span> <a 
+ id="x1-70003.1"></a>Software Patients and Testing</h4>
+<!--l. 84--><p class="noindent" >We will use the FDA approved software simulator, UVA/Padova [4]. A 30-patient (10
+adults, 10 children, 10 elderly) version of the simulator is freely available as a python
+library called simGlucose [7]. Therefore, the codebase of the project will be written
+primarily in Python 3.
+<!--l. 85--><p class="indent" >   Benchmarking will be composed of an evaluation of the simulation data after a
+long simulated test period (24 - 48 hours). Benchmarks for controller performance
+will need to be devised; possibilities include total time in acceptable range,
+severity of hypoglycemic events, severity of hyperglycemic events, stability
+of blood glucose. Models will be scored based on a combination of these
+factors.
+<!--l. 86--><p class="indent" >   CGM noise, missed readings, exogenous changes to blood glucose, and
+changes to insulin sensitivity can be simulated to test the stability of the
+controller.
+   <h4 class="subsectionHead"><span class="titlemark">3.2   </span> <a 
+ id="x1-80003.2"></a>Controllers</h4>
+<!--l. 88--><p class="noindent" >Controllers in closed-loop systems generally fall into two classes: Model Predictive
+(MPC) and Proportional-Integral-Derivative (PID) controllers. While PID controllers
+are simpler, MPC controllers have yielded the most promising results in
+the field. A range of different schemes have been clinically tested &#8211; MPC,
+PID, and some hybrids. And many more have been tested in software. [3,
+1]
+<!--l. 89--><p class="indent" >   As a first stage (phase 2), we will implement an already-existing MPC
+controller. At later stages, we will improve the controller to better suit the AP
+problem.
+
+   <h4 class="subsectionHead"><span class="titlemark">3.3   </span> <a 
+ id="x1-90003.3"></a>Hardware System and Testing</h4>
+<!--l. 91--><p class="noindent" >Experimenting with controllers using commercial hardware is
+typically not possible. However, some older model Medtronic
+pumps<span class="footnote-mark"><a 
+href="Project_Proposal2.html#fn1x0"><sup class="textsuperscript">1</sup></a></span><a 
+ id="x1-9001f1"></a>
+have been reverse-engineered to be controlled using a 915MHz radio module, which is
+available from several different manufacturers. The controller itself can run on a
+Raspberry Pi Zero WH. The pump/controller interface is available under an MIT
+license from the OpenAPS project [5]. It is also written in Python 3. The pump,
+radio, and controller hardware are inexpensive, and a complete kit can be purchased
+for a student budget (under $1000).
+<!--l. 92--><p class="indent" >   Implementing the scheme in hardware, rather than solely in software, is
+attractive. Since the AP would be a wearable device, implementing as much of it in
+hardware as possible would provide another important engineering constraint for the
+model &#8211; power, because the complexity of the controller will have direct implications
+on power usage. Further, it provides a real &#8220;proof-of-concept,&#8221; a tangible final
+milestone.
+   <h3 class="sectionHead"><span class="titlemark">4   </span> <a 
+ id="x1-100004"></a>ABET Student Outcomes</h3>
+<!--l. 94--><p class="noindent" >This project is compatible with the ABET student outcomes:
+<!--l. 96--><p class="indent" >   <span 
+class="cmti-10">A. an ability to identify, formulate, and solve complex engineering problems by</span>
+<span 
+class="cmti-10">applying principles of engineering, science, and mathematics</span>
+<!--l. 98--><p class="indent" >   The process of selecting and designing a controller for an AP will present a
+significant engineering challenge. The constraints of the AP problem are unique and
+will require a solid understanding of control theory and programming. A biological
+understanding of the response of blood glucose to insulin and environmental factors
+will be required. Finally, designing the hardware interfaces &#8211; particularly the
+hardware interface with the software patient model &#8211; will be an additional challenge.
+<!--l. 100--><p class="indent" >   <span 
+class="cmti-10">B. an ability to apply engineering design to produce solutions that meet specified</span>
+<span 
+class="cmti-10">needs with consideration of public health, safety, and welfare, as well as global,</span>
+<span 
+class="cmti-10">cultural, social, environmental, and economic factors</span>
+<!--l. 102--><p class="indent" >   Incidence of Type 1 is increasing throughout the developed word for unclear
+reasons. The disease affects 1.25 million people in the United States, many of them
+children. [2, 6] A full closed-loop AP system is the cutting edge of diabetes care &#8211; for
+now, the closest we have to a cure. An robust AP controller is an essential
+piece.
+
+<!--l. 103--><p class="indent" >   Also, any medication which can be mechanically delivered and the effects thereof
+measured on a continuous basis can be controlled in a similar manner. The design
+(interface between delivery and measurement device) and constraints (incomplete
+measurements, non-recoverable delivery) of the AP system may partially be shared
+by other medications in other contexts.
+<!--l. 105--><p class="indent" >   <span 
+class="cmti-10">C. an ability to communicate effectively with a range of audiences</span>
+<!--l. 107--><p class="indent" >   A single-person project would require close communication with project advisors,
+sponsors, and the general public. We will need literacy in multiple areas: engineering,
+biological science, and project management. If the project recruits multiple students,
+communication between team members will be not only a core priority, but essential
+to a successful outcome.
+<!--l. 109--><p class="indent" >   <span 
+class="cmti-10">D. an ability to recognize ethical and professional responsibilities in engineering</span>
+<span 
+class="cmti-10">situations and make informed judgments, which must consider the impact of</span>
+<span 
+class="cmti-10">engineering solutions in global, economic, environmental, and societal contexts</span>
+<!--l. 111--><p class="indent" >   Safety is the largest challenge of the artificial pancreas, because insulin, once
+delivered, cannot be removed. Hypoglycemia, caused when too much insulin is
+delivered, causes impairment in the best case and death at worst. On the other hand,
+hyperglycemia causes both short-term and long-term damage. While there is no
+physical risk for this project, minimizing both frequency and severity of
+hypoglycemia events will be a core constraint, just as it would be in a real closed-loop
+system.
+<!--l. 113--><p class="indent" >   <span 
+class="cmti-10">E. an ability to function effectively on a team whose members together provide</span>
+<span 
+class="cmti-10">leadership, create a collaborative and inclusive environment, establish goals, plan</span>
+<span 
+class="cmti-10">tasks, and meet objectives</span>
+<!--l. 115--><p class="indent" >   To accomplish the multiple phases of the project, a significant amount of planning
+will be required. Due to the interdisciplinary nature of the project, extensive
+collaboration between team members and advisers will be required. If multiple
+students are recruited, they will need to work together to succeed, because the team
+would need to work across disciplines.
+<!--l. 117--><p class="indent" >   <span 
+class="cmti-10">F. an ability to develop and conduct appropriate experimentation, analyze and</span>
+<span 
+class="cmti-10">interpret data, and use engineering judgment to draw conclusions</span>
+<!--l. 119--><p class="indent" >   A large amount of data will be produced from the software simulations.
+Interpreting this data to inform the design of the controller will be a central challenge
+of the project.
+<!--l. 121--><p class="indent" >   <span 
+class="cmti-10">G. an ability to acquire and apply new knowledge as needed, using appropriate</span>
+<span 
+class="cmti-10">learning strategies.</span>
+<!--l. 123--><p class="indent" >   The AP problem has been studied since the 1970 [1] &#8211; a wide body of research has
+been produced about the design of AP controllers in particular.
+
+<!--l. 130--><p class="noindent" >
+   <h3 class="sectionHead"><a 
+ id="x1-110004"></a>References</h3>
+<!--l. 130--><p class="noindent" >
+    <dl class="thebibliography"><dt id="X0-Doyle_2014" class="thebibliography">
+[1]  </dt><dd 
+id="bib-1" class="thebibliography">
+    <!--l. 130--><p class="noindent" ><a id="page.10"></a><a 
+href="Project_Proposal.html" id="X0-" ></a>FrancisJ.   Doyle   et   al.   &#8220;Closed-Loop   Artificial   Pancreas   Systems:
+    Engineering the Algorithms&#8221;. In: <span 
+class="cmti-10">Diabetes Care </span>37.5 (2014), pp. 1191&#8211;1197.
+    </dd><dt id="X0-Edwin_2002" class="thebibliography">
+[2]  </dt><dd 
+id="bib-2" class="thebibliography">
+    <!--l. 130--><p class="noindent" >Edwin A.M. Gale. &#8220;The Rise of Childhood Type 1 Diabetes in the 20th
+    Century&#8221;. In: <span 
+class="cmti-10">Diabetes </span>51.12 (2002), pp. 3353&#8211;3361.
+    </dd><dt id="X0-Hovorka_2011" class="thebibliography">
+[3]  </dt><dd 
+id="bib-3" class="thebibliography">
+    <!--l. 130--><p class="noindent" >Roman                 Hovorka.                 &#8220;Closed-loop                 insulin
+    delivery: from bench to clinical practice&#8221;. In: <span 
+class="cmti-10">Nature Reviews Endocrinology</span>
+    7.7 (Feb. 2011), pp. 385&#8211;395. <span 
+class="cmcsc-10"><span 
+class="small-caps">i</span><span 
+class="small-caps">s</span><span 
+class="small-caps">s</span><span 
+class="small-caps">n</span></span>: 1759-5037. <span 
+class="cmcsc-10"><span 
+class="small-caps">d</span><span 
+class="small-caps">o</span><span 
+class="small-caps">i</span></span>: 10.1038/nrendo.2011.32.
+    <span 
+class="cmcsc-10"><span 
+class="small-caps">u</span><span 
+class="small-caps">r</span><span 
+class="small-caps">l</span></span>: <a 
+href="http://dx.doi.org/10.1038/nrendo.2011.32" class="url" ><span 
+class="cmtt-10">http://dx.doi.org/10.1038/nrendo.2011.32</span></a>.
+    </dd><dt id="X0-Man_2014" class="thebibliography">
+[4]  </dt><dd 
+id="bib-4" class="thebibliography">
+    <!--l. 130--><p class="noindent" >Chiara   Dalla   Man   et   al.   &#8220;The   UVA/PADOVA   Type   1   Diabetes
+    Simulator&#8221;.  In:  <span 
+class="cmti-10">Journal  of  Diabetes  Science  and  Technology  </span>8.1  (Jan.
+    2014), pp. 26&#8211;34. <span 
+class="cmcsc-10"><span 
+class="small-caps">i</span><span 
+class="small-caps">s</span><span 
+class="small-caps">s</span><span 
+class="small-caps">n</span></span>: 1932-2968. <span 
+class="cmcsc-10"><span 
+class="small-caps">d</span><span 
+class="small-caps">o</span><span 
+class="small-caps">i</span></span>: 10.1177/1932296813514502. <span 
+class="cmcsc-10"><span 
+class="small-caps">u</span><span 
+class="small-caps">r</span><span 
+class="small-caps">l</span></span>:
+    <a 
+href="http://dx.doi.org/10.1177/1932296813514502" class="url" ><span 
+class="cmtt-10">http://dx.doi.org/10.1177/1932296813514502</span></a>.
+    </dd><dt id="X0-openAPS" class="thebibliography">
+[5]  </dt><dd 
+id="bib-5" class="thebibliography">
+    <!--l. 130--><p class="noindent" ><span 
+class="cmti-10">OpenAPS</span>. 2019. <span 
+class="cmcsc-10"><span 
+class="small-caps">u</span><span 
+class="small-caps">r</span><span 
+class="small-caps">l</span></span>: <a 
+href="https://openaps.org/" class="url" ><span 
+class="cmtt-10">https://openaps.org/</span></a>.
+    </dd><dt id="X0-Patterson_2018" class="thebibliography">
+[6]  </dt><dd 
+id="bib-6" class="thebibliography">
+    <!--l. 130--><p class="noindent" >Christopher                                                                               C.
+    Patterson et al. &#8220;Trends and cyclical variation in the incidence of childhood
+    type 1 diabetes in 26 European centres in the 25 year period 1989&#8211;2013:
+    a multicentre prospective registration study&#8221;. In: <span 
+class="cmti-10">Diabetologia </span>62.3 (Nov.
+    2018), pp. 408&#8211;417. <span 
+class="cmcsc-10"><span 
+class="small-caps">i</span><span 
+class="small-caps">s</span><span 
+class="small-caps">s</span><span 
+class="small-caps">n</span></span>: 1432-0428. <span 
+class="cmcsc-10"><span 
+class="small-caps">d</span><span 
+class="small-caps">o</span><span 
+class="small-caps">i</span></span>: 10.1007/s00125-018-4763-3. <span 
+class="cmcsc-10"><span 
+class="small-caps">u</span><span 
+class="small-caps">r</span><span 
+class="small-caps">l</span></span>:
+    <a 
+href="http://dx.doi.org/10.1007/s00125-018-4763-3" class="url" ><span 
+class="cmtt-10">http://dx.doi.org/10.1007/s00125-018-4763-3</span></a>.
+    </dd><dt id="X0-simglucose" class="thebibliography">
+[7]  </dt><dd 
+id="bib-7" class="thebibliography">
+    <!--l. 130--><p class="noindent" >Jinyu          Xie.          <span 
+class="cmti-10">Simglucose         v0.2.1</span>.          2018.          <span 
+class="cmcsc-10"><span 
+class="small-caps">u</span><span 
+class="small-caps">r</span><span 
+class="small-caps">l</span></span>:
+    <a 
+href="https://github.com/jxx123/simglucose" class="url" ><span 
+class="cmtt-10">https://github.com/jxx123/simglucose</span></a>.</dd></dl>
+    
+</body></html> 
+
+
+
