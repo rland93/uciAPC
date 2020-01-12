@@ -1,7 +1,8 @@
+---
 layout: page
 title: "Installation"
 permalink: /installation/
-
+---
 uciAPC is written in [Python 3.8.1](https://www.python.org/downloads/).
 
 ## Windows
