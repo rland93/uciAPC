@@ -1,7 +1,7 @@
 ---
 layout: page
-title: "Installation"
-permalink: /installation/
+title: "simGlucose Installation"
+permalink: /simGlucoseInstallation/
 ---
 uciAPC is written in [Python 3.8.1](https://www.python.org/downloads/).
 
