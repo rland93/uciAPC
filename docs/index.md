@@ -7,6 +7,4 @@ uci AP Controller is an undergraduate research project started in Winter '19-20 
 Team members:
 + Michael Sutherland
 
-Documentation of and updates to the project will be posted to this page periodically.
-
-[simGlucose Installation](simGlucoseInstallation/)
+Documentation of the project is available on the [project wiki](https://github.com/rland93/uciAPC/wiki).
