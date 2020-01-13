@@ -1,9 +1,19 @@
-from simglucose.simulation.user_interface import simulate
+from simglucose.patient.t1dpatient import T1DPatient
+from simglucose.actuator.pump import InsulinPump
+from simglucose.sensor.cgm import CGMSensor, CGMNoise
+from simglucose.simulation.scenario_gen import RandomScenario
 from simglucose.controller.base import Controller, Action
-from datetime import timedelta
-import multiprocess
+from simglucose.simulation.env import T1DSimEnv
+from simglucose.simulation.sim_engine import SimObj, sim
 
-class MyController(Controller):
+from datetime import timedelta, datetime
+
+import sys, inspect
+
+'''
+CREATE CONTROLLER LOGIC
+'''
+class blankController(Controller):
     def __init__(self, init_state):
         self.init_state = init_state
         self.state = init_state
@@ -14,11 +24,28 @@ class MyController(Controller):
     def reset(self):
         self.state = self.init_state
 
-myctrl = MyController(0)
-time =  timedelta(hours=3)
-
-simulate(
-    sim_time = time,
-    controller=myctrl,
-    parallel=True,
-    )
+'''
+Everything following is environment setup.
+'''
+RANDOM_SEED = 25
+# System params
+results_path = './results/'
+# Simulation Environment
+simtime =  timedelta(hours=12)
+start_time = datetime.now()
+patientA = T1DPatient.withID(11)
+patientB = T1DPatient.withID(1)
+pump = InsulinPump.withName('Insulet')
+sensor = CGMSensor.withName('Dexcom')
+scenario = RandomScenario(start_time = start_time, seed = RANDOM_SEED)
+environment = T1DSimEnv(patientA, sensor, pump, scenario)
+# controller
+controller = blankController(0)
+s = SimObj(
+    environment,
+    controller, 
+    simtime, 
+    animate = False, 
+    path= results_path)
+results = sim(s)
+print(results)
