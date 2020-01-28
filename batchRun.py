@@ -7,7 +7,7 @@ from simglucose.simulation.sim_engine import SimObj, sim,batch_sim
 from datetime import timedelta, datetime
 from multiprocessing import Process,Queue, current_process, freeze_support
 import sys, argparse
-from controller import blankController
+from controller import blankController, naivePID
 
 # script saves csv(s) into this path
 results_path = './results/'
@@ -37,7 +37,7 @@ simObjs = []
 for patientid in range(args.patient_lower, args.patient_upper + 1):
     patient = T1DPatient.withID(patientid)
     environment = T1DSimEnv(patient, sim_sensor, sim_pump, sim_scenario)
-    controller = blankController(0)
+    controller = naivePID(0)
     simObjs.append(SimObj(
         environment,
         controller,
