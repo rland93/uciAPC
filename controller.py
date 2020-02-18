@@ -26,7 +26,7 @@ class blankController(Controller):
 
 
 class PController(Controller):
-    def __init__(self, target=110, gain=1, lower_bound = 75):
+    def __init__(self, target=140, gain=1, pweight = 1, dweight=1.4, lower_bound = 75):
         self.quest = pd.read_csv(CONTROL_QUEST)
         self.patient_params = pd.read_csv(
             PATIENT_PARA_FILE)
@@ -35,8 +35,14 @@ class PController(Controller):
         self.target = target
         self.lower_bound = lower_bound
 
-        # controller gain
+        # to begin, values of bg used to calculate dxdt are set to target BG
+        self.prev1 = target
+        self.prev2 = target
+
+        # controller gain, weights
         self.gain = gain
+        self.pweight = pweight / (pweight + dweight)
+        self.dweight = dweight / (pweight + dweight)
 
         
 
@@ -44,17 +50,25 @@ class PController(Controller):
         sample_time = kwargs.get('sample_time', 1)
         pname = kwargs.get('patient_name')
 
-        action = self._bb_policy(
+        action = self._policy(
             pname,
             observation.CGM,
+            self.prev1, 
+            self.prev2,
             sample_time)
+
+        # store previous glucose readings for calculating derivative
+        self.prev2 = self.prev1
+        self.prev1 = observation.CGM
+
+
         return action
 
 
     # name = patient name (for lookup)
     # glucose = cgm level in current interval
     # env_sample_time = time between samples
-    def _bb_policy(self, name, glucose, env_sample_time):
+    def _policy(self, name, glucose, prev1, prev2, env_sample_time):
         # if a  patient exists fetch their data 
         if any(self.quest.Name.str.match(name)):
             q = self.quest[self.quest.Name.str.match(name)]
@@ -72,13 +86,20 @@ class PController(Controller):
         # TODO: What does u2ss mean?
         basal = u2ss * BW / 6000
 
+        '''proportional term'''
         # scale error to units of insulin according to correction factor
-        error = np.asscalar((glucose - self.target) / q.CF.values)
+        pterm = np.asscalar((glucose - self.target) / q.CF.values)
 
-        # only positive correction
-        if error > 0:
-            bolus = error * self.gain
-        else: bolus = 0
+        '''derivative term'''
+        # unit is mg/dl per minute
+        dterm = (glucose + prev1 + prev2) / 3 / env_sample_time / q.CF.values
+
+        '''gain'''
+        bolus = (pterm * self.pweight + dterm * self.dweight) * self.gain
+
+        # cannot have negative bolus
+        if bolus < 0:
+            bolus = 0
 
         # if bg falls below a lower bound, suspend all insulin delivery
         if glucose < self.lower_bound:
@@ -88,4 +109,3 @@ class PController(Controller):
         bolus = bolus / env_sample_time
         action = Action(basal=basal, bolus=bolus)
         return action
-    
