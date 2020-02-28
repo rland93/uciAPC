@@ -5,7 +5,6 @@ from simglucose.actuator.pump import InsulinPump
 from simglucose.simulation.scenario_gen import RandomScenario
 from simglucose.simulation.scenario import Action, CustomScenario
 from simglucose.simulation.env import T1DSimEnv
-import plotBG
 from controller import PController
 from datetime import timedelta, datetime
 import collections
@@ -51,9 +50,10 @@ controllers = [copy.deepcopy(controller) for _ in range(len(envs))]
 sim_instances = [SimObj(env, ctr, run_time, animate=False, path='./results') for (env, ctr) in zip(envs, controllers)]
 
 # run simulations
-results = batch_sim(sim_instances, parallel=True)
+results = batch_sim(sim_instances, parallel=False)
 
 # create dataframe with all results
 df = pd.concat(results, keys=[s.env.patient.name for s in sim_instances])
 
-plotBG.group_plot(df, savedir='./results')
+# pickle results
+df.to_pickle('./results/df.pkl')
