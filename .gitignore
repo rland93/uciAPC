@@ -4,3 +4,4 @@ venv/*
 **.whl
 results/*
 __pycache__/*
+simglucose/*

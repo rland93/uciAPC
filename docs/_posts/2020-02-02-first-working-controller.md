@@ -3,7 +3,7 @@ layout: post
 title:  "First working controller, and visualizations"
 author: Mike
 date:   2020-02-01
-categories: jekyll update
+categories: update
 ---
 
 ## Controller
