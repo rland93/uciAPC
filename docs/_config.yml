@@ -1,2 +1,6 @@
 theme: jekyll-theme-minimal
+<<<<<<< HEAD
 baseurl: "/uciAPC"
+=======
+baseurl: /uciAPC/
+>>>>>>> 3603b7e9593dbad028c1d2fcb320b29ec1e6cbc8
