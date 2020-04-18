@@ -5,7 +5,7 @@ from simglucose.actuator.pump import InsulinPump
 from simglucose.simulation.scenario_gen import RandomScenario
 from simglucose.simulation.scenario import Action, CustomScenario
 from simglucose.simulation.env import T1DSimEnv
-from controller import PController
+from controller import PIDController
 from datetime import timedelta, datetime
 import collections
 import numpy as np
@@ -109,8 +109,35 @@ def multi_run(n, simtime, meals, controller, patients):
 
     return pd.concat(frames, keys=names)
 
+
+# controller attributes
+lowBG = 60
+targetBG = 120
+
+# sim attributes
+simruns = 5
+runtime = 24
 patients = adults
-meals = [(timedelta(hours=4), 30),(timedelta(hours=10),75),(timedelta(hours=18),40)]
-controller = PController(gain = 0.02, dweight=.5, pweight=1, target=120)
-df = multi_run(100, 36, meals, controller, patients)
-df.to_pickle("./100pt.bz2")
+meals = [(timedelta(hours=4), 80)]
+
+# create controller
+controller = PIDController(targetBG, lowBG)
+
+# run simulation
+df = multi_run(simruns, runtime, meals, controller, patients)
+
+# dump info disk
+info = pd.DataFrame({
+    "runs" : simruns,
+    "runtime" : runtime,
+    "patients" : patients,
+    "targetBG" : targetBG,
+    "lowBG" : lowBG,
+    "pgain" : pgain,
+    "igain" : igain,
+    "dgain" : dgain
+})
+print(df)
+
+df.to_pickle("results/" + str(datetime.now()) + "-run.bz2")
+info.to_csv("results/" + str(datetime.now()) + "-information.csv")
