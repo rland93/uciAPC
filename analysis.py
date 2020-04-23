@@ -10,6 +10,7 @@ register_matplotlib_converters()
 
 # path to save figures
 fig_path = "./results/" + str(datetime.datetime.strftime( datetime.datetime.now(), "%Y%m%d%H%M%S"))
+DPI = 300
 
 # interval of time ticks on x-axis
 HR_INTERVAL = 2
@@ -104,11 +105,14 @@ plt.subplots_adjust(
     bottom=.13
     )
 
-# generate ax with CHO overlay
-# TODO: custom aspect ratio
-#   https://github.com/matplotlib/matplotlib/issues/7654
-def bg_plot(bg_ts_ax):
-    # BG_ts
+def bg_plot(show=False):
+    '''
+    generate a bg timeseries plot and save to disk
+    into fig_path.
+    show - optional, default false; if true, show the plot in a tk window
+    '''
+
+    bg_ts_ax = plt.subplot(gs[:,:])
     bg_ts_ax.fill_between(t, BG_ts["Upper Envelope"], BG_ts["Lower Envelope"], alpha=0.08, color='blue', label="std")
     bg_ts_ax.plot(t, BG_ts["Mean"], label="Mean", color='black')
     bg_ts_ax.plot(t, BG_ts["Max"],linestyle='--', color='mediumpurple', label='Max')
@@ -139,30 +143,50 @@ def bg_plot(bg_ts_ax):
             height = rect.get_height()
             cho_axx.text(rect.get_x() + rect.get_width() / 2, height, "CHO: " + str(label),
                     ha='center', va='bottom', color=CHO_COLOR)
+    plt.savefig(
+        fig_path + "BG_ts.png", 
+        dpi=DPI, 
+        transparent=False)
+    if show:
+        plt.show()
 
 
 
 # Histogram of bin counts
-def bg_counts(BG_counts_hist_ax):
-    BG_counts_hist_ax.set_title("Glucose by Count")
+def bg_counts(show=False):
+    bg_counts_ax = plt.subplot(gs[:,:])
+    bg_counts_ax.set_title("Glucose by Count")
     BG_counts = gen_bg_bin_counts(BG_ts, [bin for bin in gen_bg_bins(20,0,400)])
     x = BG_counts.sum(axis=0).index.values.astype(str) # category labels
     y = BG_counts.sum(axis=0).values / BG_counts.sum(axis=0).values.sum() * 100 # normalized
-    BG_counts_hist_ax.bar(x,y, width=0.95)
-    for label in BG_counts_hist_ax.xaxis.get_ticklabels():
+    bg_counts_ax.bar(x,y, width=0.95)
+    for label in bg_counts_ax.xaxis.get_ticklabels():
         label.set_rotation(90)
-    BG_counts_hist_ax.set_ylabel("Percentage of vals in range")
-    BG_counts_hist_ax.set_xlabel("Range")
+    bg_counts_ax.set_ylabel("Percentage of vals in range")
+    bg_counts_ax.set_xlabel("Range")
+    plt.savefig(
+        fig_path + "bg_counts.png", 
+        dpi=DPI, 
+        transparent=False)
+    if show:
+        plt.show()
 
 # Histogram for bg derivative
-def bg_deriv_hist(BG_derivative_ax, save=False):
-    BG_derivative_ax.set_title("Glucose Derivative by Count")
+def bg_deriv_hist(show=False):
+    bg_deriv_hist_ax = plt.subplot()
+    bg_deriv_hist_ax.set_title("Glucose Derivative by Count")
     BG_deriv_counts = gen_bg_bin_counts(get_bg_derivative(t, BG_ts["Mean"]), [bin for bin in gen_bg_bins(0.05, 0, 1)])
     x = BG_deriv_counts.sum(axis=0).index.values.astype(str)
     y = BG_deriv_counts.sum(axis=0).values
-    BG_derivative_ax.bar(x,y, width=0.95)
-    for label in BG_derivative_ax.xaxis.get_ticklabels():
+    bg_deriv_hist_ax.bar(x,y, width=0.95)
+    for label in bg_deriv_hist_ax.xaxis.get_ticklabels():
         label.set_rotation(90)
+    plt.savefig(
+        fig_path + "bg_deriv_hist.png", 
+        dpi=DPI, 
+        transparent=False)
+    if show:
+        plt.show()
 '''
 # Poincare Charts
 BG_poincare_ax1 = plt.subplot(gs[5:, 0:1])
@@ -183,16 +207,3 @@ BG_poincare_ax2.scatter(poincares[1]["t"], poincares[1]["t+1"])
 BG_poincare_ax3.scatter(poincares[2]["t"], poincares[2]["t+1"])
 BG_poincare_ax4.scatter(poincares[3]["t"], poincares[3]["t+1"])
 '''
-
-
-
-# generate plots:
-
-DPI = 300
-bg_ts = plt.subplot(gs[:,:])
-bg_plot(bg_ts)
-plt.savefig(
-    fig_path + "BG_ts.png", 
-    dpi=DPI, 
-    transparent=False)
-plt.show()

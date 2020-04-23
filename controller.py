@@ -32,7 +32,12 @@ class blankController(Controller):
 # igain = derivative gain
 
 class PIDController(Controller):
-    def __init__(self, target, lower_bound):
+    '''
+    target - target bg
+    lower_bound - lower BG bound
+    name - patient name
+    '''
+    def __init__(self, target, lower_bound, name):
         # patient params, for setting basal
         self.quest = pd.read_csv(CONTROL_QUEST)
         self.patient_params = pd.read_csv(
@@ -46,9 +51,21 @@ class PIDController(Controller):
         self.prev1 = target
         self.prev2 = target
 
-        # set gains per patient
+        ''' basal, PID gains are set patient-to-patient'''
+        if any(self.quest.Name.str.match(name)):
+            params = self.patient_params[self.patient_params.Name.str.match(name)]
+            quest = self.quest[self.quest.Name.str.match(name)]
+            self.patient_BW = np.asscalar(params.BW.values)
+            self.patient_basal = np.asscalar(params.u2ss.values) * self.patient_BW / 6000
+            self.patient_TDI = np.asscalar(quest.TDI.values)
 
-
+            # The Effect of Insulin Feedback on Closed Loop Glucose Control
+            # Steil, 2011
+            self.pgain = self.patient_TDI / (self.patient_BW * 135)
+            self.igain = self.pgain * 450   # tau 1
+            self.dgain = self.pgain * 90    # tau 2
+        else:
+            raise LookupError("Patient name or ID not in Quest or Params")
         # integral error
         self.ierror = 0
 
@@ -72,26 +89,17 @@ class PIDController(Controller):
     # glucose = cgm level in current interval
     # env_sample_time = time between samples
     def _policy(self, name, glucose, prev1, prev2, env_sample_time):
-        # increment integral error
-        self.ierror += glucose - self.target
-        
-        # set basal rate from patient data
-        basal = get_patient_basal(name)
-
         '''proportional term'''
         # scale error to units of insulin according to correction factor
-        pterm = np.asscalar((glucose - self.target)
-
+        pterm = np.asscalar((glucose - self.target))
         '''integral term'''
-        iterm = self.ierror
-
+        # increment integral error
+        self.ierror += glucose - self.target
         '''derivative term'''
         # unit is mg/dl per minute
         dterm = (glucose + prev1 + prev2) / 3 / env_sample_time
-
         '''set bolus'''
-        bolus = pterm * self.pgain + iterm * self.igain + dterm * self.dgain
-
+        bolus = pterm * self.pgain + self.ierror * self.igain + dterm * self.dgain
         # cannot have negative bolus
         if bolus < 0:
             bolus = 0
@@ -102,26 +110,4 @@ class PIDController(Controller):
             basal = 0
 
         bolus = bolus / env_sample_time
-        return Action(basal=basal, bolus=bolus)
-
-
-    #TODO: refactor this
-    def get_patient_basal(self, name):
-        '''get the basal'''
-        if any(self.quest.Name.str.match(name)):
-            params = self.patient_params[self.patient_params.Name.str.match(name)]
-            q = self.quest[self.quest.Name.str.match(name)]
-            patient_basal = np.asscalar(params.u2ss.values) * np.asscalar(q.BW.values) / 6000
-        return patient_basal
-
-    def set_patient_gains(self, name):
-        '''set gains by patient params'''
-        if any(self.quest.Name.str.match(name)):
-            q = self.quest[self.quest.Name.str.match(name)]
-            params = self.patient_params[self.patient_params.Name.str.match(name)]
-            # The Effect of Insulin Feedback on Closed Loop Glucose Control
-            # Steil, 2011
-            i_dir = np.asscalar(params.TDI.values) / np.asscalar(q.BW.values)
-            self.pgain = i_dir / 135
-            self.igain = self.pgain * 450
-            self.dgain = self.pgain * 90
+        return Action(basal=self.patient_basal, bolus=bolus)

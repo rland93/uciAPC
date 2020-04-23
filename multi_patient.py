@@ -51,47 +51,32 @@ adults =   ["adult#001",
             "adult#009",
             "adult#010"]
 
-# patients is an array of patient NAMES. These names can be found in PATIENT_PARA_FILE.
-def build_envs(scenario, start_time, patients):
+
+
+
+
+def run_sim_once(simtime, meals, patients, targetBG, lowBG):
+    run_time = timedelta(hours=simtime)
+    start_time = datetime(2020, 1, 1, 0,0,0)
+    scenario = CustomScenario(start_time = start_time, scenario=meals)
     def build_env(pname):
         patient = T1DPatient.withName(pname)
+        controller = PIDController(targetBG, lowBG, pname)
         sensor = CGMSensor.withName('Dexcom')
         pump = InsulinPump.withName('Insulet')
         copied_scenario = copy.deepcopy(scenario)
         env = T1DSimEnv(patient, sensor, pump, copied_scenario)
-        return env
-    return [build_env(patient) for patient in patients]
+        instance = SimObj(env, controller, run_time, path='./results', animate = False)
+        return instance
+    # run batch sim
+    results = batch_sim([build_env(pname) for pname in patients], parallel=True)
+    return pd.concat(results)
 
-# run sim for multiple patients once
-def run_sim_once(simtime, meals, controller, patients):
-    # times
-    run_time = timedelta(hours=simtime)
-    start_time = datetime(2020, 1, 1, 0,0,0)
-    scenario = CustomScenario(start_time = start_time, scenario=meals)
-    envs = build_envs(scenario, start_time, patients)
-    # must deepcopy controllers because they're dynamic
-    controllers = [copy.deepcopy(controller) for _ in range(len(envs))]
-    sim_instances = [SimObj(env, ctr, run_time, animate=False, path='./results') for (env, ctr) in zip(envs, controllers)]
-    # run simulations
-    results = batch_sim(sim_instances, parallel=False)
-    # create dataframe with results from 1 sim
-    return pd.concat(results, keys=[s.env.patient.name for s in sim_instances])
-
-
-# returns a dataframe of a 4d array: row level 1 is run, row level 2 is param (BG, insulin, etc.), row 3 is patient name. cols are sim times.
-#
-# n - simulation runs, int
-# simtime - how long sim should run, int
-# meals - array of tuples; time and CHO amt (timedelta, int)
-# controller - which controller, Controller
-# patients - patient group, string array 
-# TODO: Memory will be an issue the way this is set up now
-
-def multi_run(n, simtime, meals, controller, patients):
+def multi_run(n_runs, simtime, meals, patients, target, low):
     frames = []
     names = []
-    for run in range(0, n):
-        siminstance = run_sim_once(simtime, meals, controller, patients)
+    for run in range(0, n_runs):
+        siminstance = run_sim_once(simtime, meals, patients, target, low)
         # reformat a single sim instance, time as rows, BG, CGM, etc. by patient in cols
         BG =        siminstance.unstack(level=0).BG.transpose()
         CGM =       siminstance.unstack(level=0).CGM.transpose()
@@ -110,34 +95,14 @@ def multi_run(n, simtime, meals, controller, patients):
     return pd.concat(frames, keys=names)
 
 
-# controller attributes
-lowBG = 60
-targetBG = 120
 
-# sim attributes
-simruns = 5
-runtime = 24
-patients = adults
-meals = [(timedelta(hours=4), 80)]
+t = 4
+n = 2
+meals = [(timedelta(hours=2), 80)]
+twopts = ["adult#001","adult#002"]
+target = 100
+low = 60
 
-# create controller
-controller = PIDController(targetBG, lowBG)
 
-# run simulation
-df = multi_run(simruns, runtime, meals, controller, patients)
-
-# dump info disk
-info = pd.DataFrame({
-    "runs" : simruns,
-    "runtime" : runtime,
-    "patients" : patients,
-    "targetBG" : targetBG,
-    "lowBG" : lowBG,
-    "pgain" : pgain,
-    "igain" : igain,
-    "dgain" : dgain
-})
+df = multi_run(n, t, meals, twopts, target, low)
 print(df)
-
-df.to_pickle("results/" + str(datetime.now()) + "-run.bz2")
-info.to_csv("results/" + str(datetime.now()) + "-information.csv")
