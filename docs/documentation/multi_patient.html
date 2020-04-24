@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.8.1" />
+<title>uci_apc.multi_patient API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>uci_apc.multi_patient</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import pandas as pd
+import copy
+import pathos.pools
+import time
+from simglucose.patient.t1dpatient import T1DPatient
+from simglucose.simulation.sim_engine import SimObj
+from simglucose.sensor.cgm import CGMSensor, CGMNoise
+from simglucose.actuator.pump import InsulinPump
+from simglucose.simulation.scenario_gen import RandomScenario
+from simglucose.simulation.scenario import Action, CustomScenario
+from simglucose.simulation.env import T1DSimEnv
+from uci_apc.controller import PIDController
+from datetime import timedelta, datetime
+
+FRIENDLY_DATE_STR = str(datetime.strftime( datetime.now(), &#34;%Y%m%d%H%M%S&#34;))
+
+def sim(sim_object):
+    &#39;&#39;&#39;
+    Simulate a sim object
+
+    Parameters
+    ----------
+    sim_object: simglucose.simulation.sim_engine SimObj
+
+    Returns
+    -------
+    A pandas dataframe containing the simulation results.
+        axis=0: time, type datetime.datetime
+        axis=1: data category, type str
+    &#39;&#39;&#39;
+    print(&#39;simulating...&#39;)
+    sim_object.simulate()
+    return sim_object.results()
+
+
+def run_sim_PID(no_runs, patients, runtime, meals, controller_params, path):
+    &#39;&#39;&#39;
+    Run the simulation a single time on a list of patients with the PID controller.
+
+    Parameters
+    ----------
+    no_runs: int
+        the number of separate simulation runs.
+    patients: list of str
+        a list of patient name strings. Patient name strings can be found in the params/Quest.csv file inside simGlucose.
+    runtime: int
+        simulation time, in hours.
+    meals: (timedelta, int)
+        a tuple containing the time of meal (as referenced from simulation start) and the meal size, in grams.
+    targetBG: int
+        the target blood glucose for the controller, in mg/dl
+    lowBG: int
+        the pump suspension glucose for the controller, in mg/dl
+
+    Returns
+    -------
+    A pandas dataframe containing the simulation results.
+        axis=0: time, type datetime.datetime
+        axis=1: MultiIndex
+            level 0: data category, type str
+            level 1: patient id, type str
+            level 2: run number, type int (starts at 1)
+    &#39;&#39;&#39;
+    sensor = CGMSensor.withName(&#39;Dexcom&#39;)
+    pump = InsulinPump.withName(&#39;Insulet&#39;)
+    scenario = CustomScenario(start_time = datetime(2020, 1, 1, 0,0,0), scenario=meals)
+    sim_objs = []
+    keys = []
+    for run in range(0, no_runs):
+        for pname in patients:
+            sim_objs.append(SimObj(T1DSimEnv(T1DPatient.withName(pname), 
+                                sensor, 
+                                pump, 
+                                copy.deepcopy(scenario)), # because random numbers.
+                                PIDController(controller_params, pname),
+                                timedelta(hours=runtime),
+                                animate=False,
+                                path=None))
+            keys.append((run + 1, pname))
+    p_start = time.time()
+    print(&#39;Running batch simulation of {} items...&#39;.format(len(patients * no_runs)))
+    p = pathos.pools.ProcessPool()
+    results = p.map(sim, sim_objs)
+    print(&#39;Simulation took {} seconds.&#39;.format(time.time() - p_start))
+    return pd.concat(results, axis=1, keys=keys)
+
+def run_sim_PID_once(pname, runtime, meals, controller_params, path):
+    &#39;&#39;&#39;
+    Run the simulation a single time on a single patient with the PID controller.
+
+    Parameters
+    ----------
+    pname: str
+        patient name
+    runtime: int
+        simulation time, in hours.
+    meals: (timedelta, int)
+        a tuple containing the time of meal (as referenced from simulation start) and the meal size, in grams.
+    targetBG: int
+        the target blood glucose for the controller, in mg/dl
+    lowBG: int
+        the pump suspension glucose for the controller, in mg/dl
+
+    Returns
+    -------
+    A pandas dataframe containing the simulation results.
+        axis=0: time, type datetime.datetime
+        axis=1: data category, type str
+    &#39;&#39;&#39;
+    sensor = CGMSensor.withName(&#39;Dexcom&#39;)
+    pump = InsulinPump.withName(&#39;Insulet&#39;)
+    scenario = CustomScenario(start_time = datetime(2020, 1, 1, 0,0,0), scenario=meals)
+    obj = SimObj(T1DSimEnv(T1DPatient.withName(pname), 
+        sensor, 
+        pump, 
+        scenario),
+        PIDController(controller_params, pname),
+        timedelta(hours=runtime),
+        animate=False,
+        path=None)
+    return sim(obj)
+
+
+if __name__ == &#39;__main__&#39;:
+    adolescents =   [&#34;adolescent#001&#34;,&#34;adolescent#002&#34;,&#34;adolescent#003&#34;,&#34;adolescent#004&#34;,&#34;adolescent#005&#34;,&#34;adolescent#006&#34;,&#34;adolescent#007&#34;,&#34;adolescent#008&#34;,&#34;adolescent#009&#34;,&#34;adolescent#010&#34;]
+    children =      [&#34;child#001&#34;,&#34;child#002&#34;,&#34;child#003&#34;,&#34;child#004&#34;,&#34;child#005&#34;,&#34;child#006&#34;,&#34;child#007&#34;,&#34;child#008&#34;,&#34;child#009&#34;,&#34;child#010&#34;]
+    adults =        [&#34;adult#001&#34;,&#34;adult#002&#34;,&#34;adult#003&#34;,&#34;adult#004&#34;,&#34;adult#005&#34;,&#34;adult#006&#34;,&#34;adult#007&#34;,&#34;adult#008&#34;,&#34;adult#009&#34;,&#34;adult#010&#34;]
+              # (target,    low,    tau_c)
+    PIDparams = (120,       70,     100  )
+    t = 24
+    n = 40
+    meals = [(timedelta(hours=4), 80)]
+    pts = adults
+    dfs = run_sim_PID(n, adults, t, meals, PIDparams, &#39;./results/&#39;)
+    save=False
+    if save:
+        dfs_path = str(&#39;./results/&#39; + FRIENDLY_DATE_STR + &#39;-dfs.csv&#39;)
+        dfs.to_csv(dfs_path)
+    dfs.to_pickle(&#39;./results/&#39; + &#39;adults_1-8_x40.bz2&#39;)
+    print(dfs)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="uci_apc.multi_patient.run_sim_PID"><code class="name flex">
+<span>def <span class="ident">run_sim_PID</span></span>(<span>no_runs, patients, runtime, meals, controller_params, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Run the simulation a single time on a list of patients with the PID controller.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>no_runs</code></strong> :&ensp;<code>int</code></dt>
+<dd>the number of separate simulation runs.</dd>
+<dt><strong><code>patients</code></strong> :&ensp;<code>list</code> of <code>str</code></dt>
+<dd>a list of patient name strings. Patient name strings can be found in the params/Quest.csv file inside simGlucose.</dd>
+<dt><strong><code>runtime</code></strong> :&ensp;<code>int</code></dt>
+<dd>simulation time, in hours.</dd>
+<dt><strong><code>meals</code></strong> :&ensp;<code>(timedelta, int)</code></dt>
+<dd>a tuple containing the time of meal (as referenced from simulation start) and the meal size, in grams.</dd>
+<dt><strong><code>targetBG</code></strong> :&ensp;<code>int</code></dt>
+<dd>the target blood glucose for the controller, in mg/dl</dd>
+<dt><strong><code>lowBG</code></strong> :&ensp;<code>int</code></dt>
+<dd>the pump suspension glucose for the controller, in mg/dl</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A pandas dataframe containing the simulation results.
+axis=0: time, type datetime.datetime
+axis=1: MultiIndex
+level 0: data category, type str
+level 1: patient id, type str
+level 2: run number, type int (starts at 1)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run_sim_PID(no_runs, patients, runtime, meals, controller_params, path):
+    &#39;&#39;&#39;
+    Run the simulation a single time on a list of patients with the PID controller.
+
+    Parameters
+    ----------
+    no_runs: int
+        the number of separate simulation runs.
+    patients: list of str
+        a list of patient name strings. Patient name strings can be found in the params/Quest.csv file inside simGlucose.
+    runtime: int
+        simulation time, in hours.
+    meals: (timedelta, int)
+        a tuple containing the time of meal (as referenced from simulation start) and the meal size, in grams.
+    targetBG: int
+        the target blood glucose for the controller, in mg/dl
+    lowBG: int
+        the pump suspension glucose for the controller, in mg/dl
+
+    Returns
+    -------
+    A pandas dataframe containing the simulation results.
+        axis=0: time, type datetime.datetime
+        axis=1: MultiIndex
+            level 0: data category, type str
+            level 1: patient id, type str
+            level 2: run number, type int (starts at 1)
+    &#39;&#39;&#39;
+    sensor = CGMSensor.withName(&#39;Dexcom&#39;)
+    pump = InsulinPump.withName(&#39;Insulet&#39;)
+    scenario = CustomScenario(start_time = datetime(2020, 1, 1, 0,0,0), scenario=meals)
+    sim_objs = []
+    keys = []
+    for run in range(0, no_runs):
+        for pname in patients:
+            sim_objs.append(SimObj(T1DSimEnv(T1DPatient.withName(pname), 
+                                sensor, 
+                                pump, 
+                                copy.deepcopy(scenario)), # because random numbers.
+                                PIDController(controller_params, pname),
+                                timedelta(hours=runtime),
+                                animate=False,
+                                path=None))
+            keys.append((run + 1, pname))
+    p_start = time.time()
+    print(&#39;Running batch simulation of {} items...&#39;.format(len(patients * no_runs)))
+    p = pathos.pools.ProcessPool()
+    results = p.map(sim, sim_objs)
+    print(&#39;Simulation took {} seconds.&#39;.format(time.time() - p_start))
+    return pd.concat(results, axis=1, keys=keys)</code></pre>
+</details>
+</dd>
+<dt id="uci_apc.multi_patient.run_sim_PID_once"><code class="name flex">
+<span>def <span class="ident">run_sim_PID_once</span></span>(<span>pname, runtime, meals, controller_params, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Run the simulation a single time on a single patient with the PID controller.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>pname</code></strong> :&ensp;<code>str</code></dt>
+<dd>patient name</dd>
+<dt><strong><code>runtime</code></strong> :&ensp;<code>int</code></dt>
+<dd>simulation time, in hours.</dd>
+<dt><strong><code>meals</code></strong> :&ensp;<code>(timedelta, int)</code></dt>
+<dd>a tuple containing the time of meal (as referenced from simulation start) and the meal size, in grams.</dd>
+<dt><strong><code>targetBG</code></strong> :&ensp;<code>int</code></dt>
+<dd>the target blood glucose for the controller, in mg/dl</dd>
+<dt><strong><code>lowBG</code></strong> :&ensp;<code>int</code></dt>
+<dd>the pump suspension glucose for the controller, in mg/dl</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A pandas dataframe containing the simulation results.
+axis=0: time, type datetime.datetime
+axis=1: data category, type str</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run_sim_PID_once(pname, runtime, meals, controller_params, path):
+    &#39;&#39;&#39;
+    Run the simulation a single time on a single patient with the PID controller.
+
+    Parameters
+    ----------
+    pname: str
+        patient name
+    runtime: int
+        simulation time, in hours.
+    meals: (timedelta, int)
+        a tuple containing the time of meal (as referenced from simulation start) and the meal size, in grams.
+    targetBG: int
+        the target blood glucose for the controller, in mg/dl
+    lowBG: int
+        the pump suspension glucose for the controller, in mg/dl
+
+    Returns
+    -------
+    A pandas dataframe containing the simulation results.
+        axis=0: time, type datetime.datetime
+        axis=1: data category, type str
+    &#39;&#39;&#39;
+    sensor = CGMSensor.withName(&#39;Dexcom&#39;)
+    pump = InsulinPump.withName(&#39;Insulet&#39;)
+    scenario = CustomScenario(start_time = datetime(2020, 1, 1, 0,0,0), scenario=meals)
+    obj = SimObj(T1DSimEnv(T1DPatient.withName(pname), 
+        sensor, 
+        pump, 
+        scenario),
+        PIDController(controller_params, pname),
+        timedelta(hours=runtime),
+        animate=False,
+        path=None)
+    return sim(obj)</code></pre>
+</details>
+</dd>
+<dt id="uci_apc.multi_patient.sim"><code class="name flex">
+<span>def <span class="ident">sim</span></span>(<span>sim_object)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Simulate a sim object</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>sim_object</code></strong> :&ensp;<code>simglucose.simulation.sim_engine SimObj</code></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A pandas dataframe containing the simulation results.
+axis=0: time, type datetime.datetime
+axis=1: data category, type str</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sim(sim_object):
+    &#39;&#39;&#39;
+    Simulate a sim object
+
+    Parameters
+    ----------
+    sim_object: simglucose.simulation.sim_engine SimObj
+
+    Returns
+    -------
+    A pandas dataframe containing the simulation results.
+        axis=0: time, type datetime.datetime
+        axis=1: data category, type str
+    &#39;&#39;&#39;
+    print(&#39;simulating...&#39;)
+    sim_object.simulate()
+    return sim_object.results()</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="uci_apc" href="index.html">uci_apc</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="uci_apc.multi_patient.run_sim_PID" href="#uci_apc.multi_patient.run_sim_PID">run_sim_PID</a></code></li>
+<li><code><a title="uci_apc.multi_patient.run_sim_PID_once" href="#uci_apc.multi_patient.run_sim_PID_once">run_sim_PID_once</a></code></li>
+<li><code><a title="uci_apc.multi_patient.sim" href="#uci_apc.multi_patient.sim">sim</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.1</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

@@ -8,11 +8,12 @@ We have a [trello board](https://trello.com/b/aRJtnHfg/uciapc) to keep track of 
 
 Spring 2020 Team members:
 + Mike Sutherland 
++ Kyle Adamos
 
 Alumni:
 + Ashutosh Shah (W20)
 
-Documentation of the project is available on the [project wiki](https://github.com/rland93/uciAPC/wiki).
+Documentation of the project is available <a href="{{ site.baseurl  }}/documentation/index.html">here</a>.
 
 ---
 

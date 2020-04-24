@@ -1,7 +1,3 @@
-.idea/*
-venv/*
-.vscode/*
-**.whl
-results/*
-__pycache__/*
-simglucose/*
+uci_apc/__pycache__*
+uci_apc/results*
+venv*

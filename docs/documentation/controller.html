@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.8.1" />
+<title>uci_apc.controller API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>uci_apc.controller</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from simglucose.controller.base import Controller, Action
+import pkg_resources
+import numpy as np
+import pandas as pd
+import logging
+import math
+
+logger = logging.getLogger(__name__)
+
+# Patient Data
+CONTROL_QUEST = pkg_resources.resource_filename(
+    &#39;simglucose&#39;, &#39;params/Quest.csv&#39;)
+PATIENT_PARA_FILE = pkg_resources.resource_filename(
+    &#39;simglucose&#39;, &#39;params/vpatient_params.csv&#39;)
+
+class BlankController(Controller):
+    def __init__(self, init_state):
+        self.init_state = init_state
+        self.state = init_state
+    def policy(self, observation, reward, done, **info):
+        self.state = observation
+        action = Action(basal=.03, bolus=0)
+        return action
+    def reset(self):
+        self.state = self.init_state
+
+class PIDController(Controller):
+    def __init__(self, controller_params, name):
+        # patient params, for setting basal
+        self.quest = pd.read_csv(CONTROL_QUEST)
+        self.patient_params = pd.read_csv(
+            PATIENT_PARA_FILE)
+        
+        self.target = controller_params[0]
+        self.lower_bound = controller_params[1]
+        self.tau_c = controller_params[2]
+
+        # to begin, values of bg used to calculate dxdt are set to target BG
+        self.prev1 = self.target
+        self.prev2 = self.target
+
+        &#39;&#39;&#39; basal, PID gains are set patient-to-patient&#39;&#39;&#39;
+        if any(self.quest.Name.str.match(name)):
+            params = self.patient_params[self.patient_params.Name.str.match(name)]
+            quest = self.quest[self.quest.Name.str.match(name)]
+            self.patient_BW = np.asscalar(params.BW.values)
+            self.patient_basal = np.asscalar(params.u2ss.values) * self.patient_BW / 6000
+            self.patient_TDI = np.asscalar(quest.TDI.values)
+
+            &#39;&#39;&#39;
+            Model-Based Personalization Scheme of an Artificial Pancreas for Type 1 Diabetes Applications
+            Joon Bok Lee, Eyal Dassau, Senior Member, IEEE, Dale E. Seborg, Member, IEEE, and Francis J. Doyle III*, Fellow, IEEE
+            2013 American Control Conference (ACC) Washington, DC, USA, June 17-19, 2013
+            &#39;&#39;&#39;
+            s_fb = 0.5 * self.patient_TDI / 24  # (6)
+            c = .0664                           # (5)
+            &#39;&#39;&#39;
+            Guidelines for Optimal Bolus Calculator Settings in Adults
+            John Walsh, P.A., Ruth Roberts, M.A.,2 and Timothy Bailey, M.D., FACE, C.P.I.1
+            J Diabetes Sci Technol. 2011 Jan; 5(1): 129–135. 
+            &#39;&#39;&#39;
+            k_i = 1960 / self.patient_TDI       # (3),(4)
+            K = k_i * c * s_fb                  # (2)
+            tau_1 = 247                         # (13)
+            tau_2 = 210                         # (14)
+            theta = 93.5                        # (12)
+
+            self.k_c = 2 * self.patient_basal * 298/((self.tau_c + 93.5)*1960*.5)            # (22) --&gt; Proportional Gain
+            print(&#34;k_c: {}&#34;.format(self.k_c))
+            self.tau_i = 458               # (20) --&gt; Integral Gain
+            self.tau_d = 113               # (21) --&gt; Derivative Gain
+
+        else:
+            raise LookupError(&#34;Invalid patient name.&#34;)
+
+        self.ierror = 0
+
+
+    def policy(self, observation, reward, done, **kwargs):
+        sample_time = kwargs.get(&#39;sample_time&#39;, 1)
+        pname = kwargs.get(&#39;patient_name&#39;)
+        action = self._policy(
+            pname,
+            observation.CGM,
+            self.prev1, 
+            sample_time)
+
+        # for the derivative
+        self.prev1 = observation.CGM
+        return action
+
+
+    def _policy(self, pname, glucose, prev1, env_sample_time):
+        error = np.asscalar((glucose - self.target))    # error
+        self.ierror += error                            # integral error
+        deriv = (glucose - prev1) / env_sample_time     # derivative
+
+        pterm = self.k_c * error
+        iterm = self.k_c / self.tau_i * self.ierror
+        dterm = self.k_c * self.tau_d * deriv
+
+        bolus = pterm + iterm + dterm
+        basal = self.patient_basal
+        if bolus + basal &lt; 0:
+            bolus = -1 * basal
+        return Action(basal=basal, bolus=bolus)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="uci_apc.controller.BlankController"><code class="flex name class">
+<span>class <span class="ident">BlankController</span></span>
+<span>(</span><span>init_state)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BlankController(Controller):
+    def __init__(self, init_state):
+        self.init_state = init_state
+        self.state = init_state
+    def policy(self, observation, reward, done, **info):
+        self.state = observation
+        action = Action(basal=.03, bolus=0)
+        return action
+    def reset(self):
+        self.state = self.init_state</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>simglucose.controller.base.Controller</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="uci_apc.controller.BlankController.policy"><code class="name flex">
+<span>def <span class="ident">policy</span></span>(<span>self, observation, reward, done, **info)</span>
+</code></dt>
+<dd>
+<div class="desc"><h2 id="every-controller-must-have-this-implementation">Every controller must have this implementation!</h2>
+<p>Inputs:
+observation - a namedtuple defined in simglucose.simulation.env. It has
+CHO and CGM two entries.
+reward
+- current reward returned by environment
+done
+- True, game over. False, game continues
+info
+- additional information as key word arguments,
+simglucose.simulation.env.T1DSimEnv returns patient_name
+and sample_time</p>
+<hr>
+<p>Output:
+action - a namedtuple defined at the beginning of this file. The
+controller action contains two entries: basal, bolus</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def policy(self, observation, reward, done, **info):
+    self.state = observation
+    action = Action(basal=.03, bolus=0)
+    return action</code></pre>
+</details>
+</dd>
+<dt id="uci_apc.controller.BlankController.reset"><code class="name flex">
+<span>def <span class="ident">reset</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reset the controller state to inital state, must be implemented</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset(self):
+    self.state = self.init_state</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="uci_apc.controller.PIDController"><code class="flex name class">
+<span>class <span class="ident">PIDController</span></span>
+<span>(</span><span>controller_params, name)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PIDController(Controller):
+    def __init__(self, controller_params, name):
+        # patient params, for setting basal
+        self.quest = pd.read_csv(CONTROL_QUEST)
+        self.patient_params = pd.read_csv(
+            PATIENT_PARA_FILE)
+        
+        self.target = controller_params[0]
+        self.lower_bound = controller_params[1]
+        self.tau_c = controller_params[2]
+
+        # to begin, values of bg used to calculate dxdt are set to target BG
+        self.prev1 = self.target
+        self.prev2 = self.target
+
+        &#39;&#39;&#39; basal, PID gains are set patient-to-patient&#39;&#39;&#39;
+        if any(self.quest.Name.str.match(name)):
+            params = self.patient_params[self.patient_params.Name.str.match(name)]
+            quest = self.quest[self.quest.Name.str.match(name)]
+            self.patient_BW = np.asscalar(params.BW.values)
+            self.patient_basal = np.asscalar(params.u2ss.values) * self.patient_BW / 6000
+            self.patient_TDI = np.asscalar(quest.TDI.values)
+
+            &#39;&#39;&#39;
+            Model-Based Personalization Scheme of an Artificial Pancreas for Type 1 Diabetes Applications
+            Joon Bok Lee, Eyal Dassau, Senior Member, IEEE, Dale E. Seborg, Member, IEEE, and Francis J. Doyle III*, Fellow, IEEE
+            2013 American Control Conference (ACC) Washington, DC, USA, June 17-19, 2013
+            &#39;&#39;&#39;
+            s_fb = 0.5 * self.patient_TDI / 24  # (6)
+            c = .0664                           # (5)
+            &#39;&#39;&#39;
+            Guidelines for Optimal Bolus Calculator Settings in Adults
+            John Walsh, P.A., Ruth Roberts, M.A.,2 and Timothy Bailey, M.D., FACE, C.P.I.1
+            J Diabetes Sci Technol. 2011 Jan; 5(1): 129–135. 
+            &#39;&#39;&#39;
+            k_i = 1960 / self.patient_TDI       # (3),(4)
+            K = k_i * c * s_fb                  # (2)
+            tau_1 = 247                         # (13)
+            tau_2 = 210                         # (14)
+            theta = 93.5                        # (12)
+
+            self.k_c = 2 * self.patient_basal * 298/((self.tau_c + 93.5)*1960*.5)            # (22) --&gt; Proportional Gain
+            print(&#34;k_c: {}&#34;.format(self.k_c))
+            self.tau_i = 458               # (20) --&gt; Integral Gain
+            self.tau_d = 113               # (21) --&gt; Derivative Gain
+
+        else:
+            raise LookupError(&#34;Invalid patient name.&#34;)
+
+        self.ierror = 0
+
+
+    def policy(self, observation, reward, done, **kwargs):
+        sample_time = kwargs.get(&#39;sample_time&#39;, 1)
+        pname = kwargs.get(&#39;patient_name&#39;)
+        action = self._policy(
+            pname,
+            observation.CGM,
+            self.prev1, 
+            sample_time)
+
+        # for the derivative
+        self.prev1 = observation.CGM
+        return action
+
+
+    def _policy(self, pname, glucose, prev1, env_sample_time):
+        error = np.asscalar((glucose - self.target))    # error
+        self.ierror += error                            # integral error
+        deriv = (glucose - prev1) / env_sample_time     # derivative
+
+        pterm = self.k_c * error
+        iterm = self.k_c / self.tau_i * self.ierror
+        dterm = self.k_c * self.tau_d * deriv
+
+        bolus = pterm + iterm + dterm
+        basal = self.patient_basal
+        if bolus + basal &lt; 0:
+            bolus = -1 * basal
+        return Action(basal=basal, bolus=bolus)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>simglucose.controller.base.Controller</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="uci_apc.controller.PIDController.prev2"><code class="name">var <span class="ident">prev2</span></code></dt>
+<dd>
+<div class="desc"><p>basal, PID gains are set patient-to-patient</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="uci_apc.controller.PIDController.policy"><code class="name flex">
+<span>def <span class="ident">policy</span></span>(<span>self, observation, reward, done, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><h2 id="every-controller-must-have-this-implementation">Every controller must have this implementation!</h2>
+<p>Inputs:
+observation - a namedtuple defined in simglucose.simulation.env. It has
+CHO and CGM two entries.
+reward
+- current reward returned by environment
+done
+- True, game over. False, game continues
+info
+- additional information as key word arguments,
+simglucose.simulation.env.T1DSimEnv returns patient_name
+and sample_time</p>
+<hr>
+<p>Output:
+action - a namedtuple defined at the beginning of this file. The
+controller action contains two entries: basal, bolus</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def policy(self, observation, reward, done, **kwargs):
+    sample_time = kwargs.get(&#39;sample_time&#39;, 1)
+    pname = kwargs.get(&#39;patient_name&#39;)
+    action = self._policy(
+        pname,
+        observation.CGM,
+        self.prev1, 
+        sample_time)
+
+    # for the derivative
+    self.prev1 = observation.CGM
+    return action</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="uci_apc" href="index.html">uci_apc</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="uci_apc.controller.BlankController" href="#uci_apc.controller.BlankController">BlankController</a></code></h4>
+<ul class="">
+<li><code><a title="uci_apc.controller.BlankController.policy" href="#uci_apc.controller.BlankController.policy">policy</a></code></li>
+<li><code><a title="uci_apc.controller.BlankController.reset" href="#uci_apc.controller.BlankController.reset">reset</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="uci_apc.controller.PIDController" href="#uci_apc.controller.PIDController">PIDController</a></code></h4>
+<ul class="">
+<li><code><a title="uci_apc.controller.PIDController.policy" href="#uci_apc.controller.PIDController.policy">policy</a></code></li>
+<li><code><a title="uci_apc.controller.PIDController.prev2" href="#uci_apc.controller.PIDController.prev2">prev2</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.1</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.8.1" />
+<title>uci_apc.analysis API documentation</title>
+<meta name="description" content="" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>uci_apc.analysis</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import string
+import random
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import matplotlib.gridspec as gridspec
+import matplotlib.ticker as mtick
+import datetime
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
+
+# path to save figures
+FRIENDLY_DATE_STR = str(datetime.datetime.strftime( datetime.datetime.now(), &#34;%Y%m%d%H%M%S&#34;))
+DPI = 300
+
+# interval of time ticks on x-axis
+HR_INTERVAL = 2
+
+# range of good to bad BG readings
+GOOD_CONTROL_LOWER = 80
+GOOD_CONTROL_UPPER = 160
+
+# no. of standard deviations to plot (BG timeseries chart)
+nstd=1
+
+# CHO is displayed as CHO per minute for whatever 
+# interval we sample. In this case, our interval 
+# is 3 minutes. Therefore, we multiply CHO value 
+# by 3 to get the total CHO dosed in that minute.
+# the simulator defines a &#34;meal&#34; as CHO dosed in
+# a single minute; complex meals are not considered
+INTERVAL = 3
+CHO_COLOR = &#39;crimson&#39;
+
+
+
+# collected timeseries
+def h_ts_collected(df):
+    &#39;&#39;&#39;
+    Create a single timeseries of collected data from multiple patients/runs.
+
+    Parameters
+    ----------
+    df: pandas DataFrame object
+        dataframe
+    
+    Returns
+    -------
+    dictionary:
+        &#34;index&#34; : Series of datetime objects representing the timeseries. Type: pandas Series
+        &#34;bg&#34; : Mean, Max, Min, Upper Env, Lower Env of blood glucose over the timeseries. Type: pandas DataFrame
+        &#34;HBGI&#34; : Mean, Max, Min, Upper Env, Lower Env of HBGI over the timeseries. Type: pandas DataFrame
+        &#34;LBGI&#34; : Mean, Max, Min, Upper Env, Lower Env of LBGI glucose over the timeseries. Type: pandas DataFrame
+    &#39;&#39;&#39;
+    bg = pd.DataFrame( {
+        &#34;Mean&#34; : df.loc(axis=1)[:,:,&#34;BG&#34;].mean(axis=1),
+        &#34;Max&#34; : df.loc(axis=1)[:,:,&#34;BG&#34;].max(axis=1),
+        &#34;Min&#34; : df.loc(axis=1)[:,:,&#34;BG&#34;].min(axis=1),
+        &#34;Upper Envelope&#34; : df.loc(axis=1)[:,:,&#34;BG&#34;].mean(axis=1) + nstd * df.loc(axis=1)[:,:,&#34;BG&#34;].std(axis=1),
+        &#34;Lower Envelope&#34; : df.loc(axis=1)[:,:,&#34;BG&#34;].mean(axis=1) - nstd * df.loc(axis=1)[:,:,&#34;BG&#34;].std(axis=1)
+        })
+    hbgi = pd.DataFrame( {
+        &#34;Mean&#34; : df.loc(axis=1)[:,:,&#34;HBGI&#34;].mean(axis=1),
+        &#34;Max&#34; : df.loc(axis=1)[:,:,&#34;HBGI&#34;].max(axis=1),
+        &#34;Min&#34; : df.loc(axis=1)[:,:,&#34;HBGI&#34;].min(axis=1),
+        &#34;Upper Envelope&#34; : df.loc(axis=1)[:,:,&#34;HBGI&#34;].mean(axis=1) + nstd * df.loc(axis=1)[:,:,&#34;HBGI&#34;].std(axis=1),
+        &#34;Lower Envelope&#34; : df.loc(axis=1)[:,:,&#34;HBGI&#34;].mean(axis=1) - nstd * df.loc(axis=1)[:,:,&#34;HBGI&#34;].std(axis=1)
+        })
+    lbgi = pd.DataFrame( {
+        &#34;Mean&#34; : df.loc(axis=1)[:,:,&#34;LBGI&#34;].mean(axis=1),
+        &#34;Max&#34; : df.loc(axis=1)[:,:,&#34;LBGI&#34;].max(axis=1),
+        &#34;Min&#34; : df.loc(axis=1)[:,:,&#34;LBGI&#34;].min(axis=1),
+        &#34;Upper Envelope&#34; : df.loc(axis=1)[:,:,&#34;LBGI&#34;].mean(axis=1) + nstd * df.loc(axis=1)[:,:,&#34;LBGI&#34;].std(axis=1),
+        &#34;Lower Envelope&#34; : df.loc(axis=1)[:,:,&#34;LBGI&#34;].mean(axis=1) - nstd * df.loc(axis=1)[:,:,&#34;LBGI&#34;].std(axis=1)
+        })
+
+    return {&#34;index&#34;: df.index, 
+            &#34;bg&#34; : bg, 
+            &#34;HBGI&#34; : hbgi,
+            &#34;LBGI&#34; : lbgi}
+
+def h_ts_sample(df):
+    &#39;&#39;&#39; 
+    Parameters
+    ----------
+    df: pandas DataFrame object
+        dataframe
+    
+    Returns
+    -------
+    pandas DataFrame
+        Non-MultiIndex Dataframe of timeseries data from a single patient. 
+    &#39;&#39;&#39;
+    # get set of runs, pts in cols
+    cols = df.columns.tolist()
+    run = random.choice(tuple(set([i[0] for i in cols]))) # random run
+    pt = random.choice(tuple(set([i[1] for i in cols]))) # random patient
+    # we have to transpose before we get rid of the level
+    # TODO this is an absolutely AWFUL way of doing this.
+    return (df.loc(axis=1)[run, pt,:].transpose().droplevel(1).droplevel(0).transpose(), run, pt)
+
+def h_gen_bg_bins(binsize, lower_lim, upper_lim):
+    &#39;&#39;&#39;
+    Generate an array of bins of a certain size.
+
+    Parameters
+    ----------
+    binsize: int
+        The bin size, in mg/dl.
+    lower_lim: int
+        The lower limit of the bins that are to be generated, in mg/dl. Not inclusive.
+    upper_lim: int
+        The upper limit of the bins that are to be generated, in mg/dl. Inclusive.
+
+    Returns
+    -------
+    int
+        The next bin divider.
+
+    Examples
+    --------
+    &gt;&gt;&gt; print([x for x in h_gen_bg_bins(10, 0, 50)])
+    [0,10,20,30,40,50]
+    &#39;&#39;&#39;
+    x = lower_lim
+    while x &lt;= upper_lim:
+        yield x
+        x +=binsize
+
+def rand_pt_bg_ts(df):
+    &#39;&#39;&#39;
+    Generate a blood glucose time series plot for a random patient and save to disk.
+
+    Parameters
+    ----------
+    df: pandas DataFrame
+        dataframe
+    
+    Returns
+    -------
+    None
+    &#39;&#39;&#39;
+    fig = plt.figure(figsize=(20,10))
+    gs = gridspec.GridSpec(6,2)
+    plt.subplots_adjust(
+        hspace=1,
+        left=.05,
+        right=.95,
+        top=.95,
+        bottom=.13)
+    pt_data = h_ts_sample(df)
+    bg_ts = plt.subplot(gs[:4,:])
+    bg_ts.plot(pt_data[0].index, pt_data[0][&#39;BG&#39;], label=&#39;Blood Glucose&#39;)
+    bg_ts.grid(axis=&#39;x&#39;, which=&#39;both&#39;)
+    bg_ts.grid(axis=&#39;y&#39;, which=&#39;major&#39;)
+    bg_ts.xaxis.set_minor_locator(mdates.HourLocator(interval=HR_INTERVAL))
+    bg_ts.xaxis.set_minor_formatter(mdates.DateFormatter(&#39;%H:%M\n&#39;))
+    bg_ts.xaxis.set_major_locator(mdates.DayLocator())
+    bg_ts.xaxis.set_major_formatter(mdates.DateFormatter(&#39;\n%b %d&#39;))
+    bg_ts.set_ylabel(&#39;Blood Glucose (mg/dl)&#39;)
+    bg_ts.axhspan(ymin=GOOD_CONTROL_LOWER, ymax=GOOD_CONTROL_UPPER, color=&#39;green&#39;, alpha=0.08)
+    bg_ts.plot(pt_data[0].index, pt_data[0][&#39;CGM&#39;], label=&#39;Insulin&#39;)
+    bg_ts.legend()
+    ins_ts = plt.subplot(gs[4:6,:])
+    ins_ts.plot(pt_data[0].index, pt_data[0][&#39;insulin&#39;])
+    ins_ts.grid(axis=&#39;x&#39;, which=&#39;both&#39;)
+    ins_ts.xaxis.set_minor_locator(mdates.HourLocator(interval=HR_INTERVAL))
+    ins_ts.xaxis.set_minor_formatter(mdates.DateFormatter(&#39;%H:%M\n&#39;))
+    ins_ts.xaxis.set_major_locator(mdates.DayLocator())
+    ins_ts.xaxis.set_major_formatter(mdates.DateFormatter(&#39;\n%b %d&#39;))
+    plt.savefig(
+        &#39;./results/&#39; + FRIENDLY_DATE_STR + &#39;-sample_bg_ts.png&#39;, 
+        dpi=DPI, 
+        transparent=False)
+    plt.close(fig)
+
+def bg_ts(df):
+    &#39;&#39;&#39;
+    Generate a time series plot containing blood glucose (mean, +-1 std, and max/min envelopes) and mean HBGI/LBGI for collected all patients and save to disk.
+
+    Parameters
+    ----------
+    df: pandas DataFrame
+        dataframe
+    
+    Returns
+    -------
+    None
+    &#39;&#39;&#39;
+    # setup
+    data = h_ts_collected(df)
+    # bg plot
+    fig = plt.figure(figsize=(20,10))
+    gs = gridspec.GridSpec(6,2)
+    plt.subplots_adjust(
+        hspace=1,
+        left=.05,
+        right=.95,
+        top=.95,
+        bottom=.13)
+    #   subplot areas
+    bg_ts = plt.subplot(gs[:4,:])
+    #   plots
+    bg_ts.fill_between(data[&#34;index&#34;], data[&#34;bg&#34;][&#34;Upper Envelope&#34;], data[&#34;bg&#34;][&#34;Lower Envelope&#34;], alpha=0.08, color=&#39;blue&#39;, label=&#34;std&#34;)
+    bg_ts.plot(data[&#34;index&#34;], data[&#34;bg&#34;][&#34;Mean&#34;], label=&#34;Mean&#34;, color=&#39;blue&#39;)
+    bg_ts.plot(data[&#34;index&#34;], data[&#34;bg&#34;][&#34;Max&#34;],linestyle=&#39;--&#39;, color=&#39;mediumpurple&#39;, label=&#39;Max&#39;)
+    bg_ts.plot(data[&#34;index&#34;], data[&#34;bg&#34;][&#34;Min&#34;], linestyle=&#39;--&#39;, color=&#39;slategrey&#39;, label=&#39;Min&#39;)
+    #   grids, legend, etc.
+    bg_ts.grid(axis=&#39;x&#39;, which=&#39;both&#39;)
+    bg_ts.grid(axis=&#39;y&#39;, which=&#39;major&#39;)
+    bg_ts.xaxis.set_minor_locator(mdates.HourLocator(interval=HR_INTERVAL))
+    bg_ts.xaxis.set_minor_formatter(mdates.DateFormatter(&#39;%H:%M\n&#39;))
+    bg_ts.xaxis.set_major_locator(mdates.DayLocator())
+    bg_ts.xaxis.set_major_formatter(mdates.DateFormatter(&#39;\n%b %d&#39;))
+    bg_ts.set_ylabel(&#39;Blood Glucose (mg/dl)&#39;)
+    bg_ts.axhspan(ymin=GOOD_CONTROL_LOWER, ymax=GOOD_CONTROL_UPPER, color=&#39;green&#39;, alpha=0.08)
+    bg_ts.legend()
+    # indicator plot
+    #   subplot area
+    indicators_ts = plt.subplot(gs[4:,:])
+    #   plots
+    indicators_ts.plot(data[&#34;index&#34;], data[&#34;HBGI&#34;][&#34;Mean&#34;], label=&#34;HBGI&#34;, color=&#39;steelblue&#39;)
+    indicators_ts.plot(data[&#34;index&#34;], data[&#34;LBGI&#34;][&#34;Mean&#34;], label=&#34;LBGI&#34;, color=&#39;maroon&#39;)
+    #   grids, legend, etc.
+    indicators_ts.legend()
+    indicators_ts.grid(axis=&#39;x&#39;, which=&#39;both&#39;)
+    indicators_ts.xaxis.set_minor_locator(mdates.HourLocator(interval=HR_INTERVAL))
+    indicators_ts.xaxis.set_minor_formatter(mdates.DateFormatter(&#39;%H:%M\n&#39;))
+    indicators_ts.xaxis.set_major_locator(mdates.DayLocator())
+    indicators_ts.xaxis.set_major_formatter(mdates.DateFormatter(&#39;\n%b %d&#39;))
+    indicators_ts.set_ylabel(&#39;HBGI/LBGI Indicator&#39;)
+    plt.savefig(
+        &#39;./results/&#39; + FRIENDLY_DATE_STR + &#39;-collective_bg_ts.png&#39;, 
+        dpi=DPI, 
+        transparent=False)
+    plt.close(fig)
+    
+def h_get_bg_derivative(df):
+    &#39;&#39;&#39;
+    Get the bg derivative as a time series.
+
+    Parameters
+    ----------
+    df: pandas DataFrame
+        dataframe
+
+    Returns
+    -------
+    pandas DataFrame
+        Glucose derivative bg(t+1) - bg(t) indexed by time. Last value is zero.
+        Index: datetime
+        Columns: derivative
+    &#39;&#39;&#39;
+    data = h_ts_collected(df)
+    index = len(data[&#39;bg&#39;].index.values.tolist()) - 1
+    derivs = []
+    for i in range(0, index):
+        dbg = data[&#39;bg&#39;][&#39;Mean&#39;].iloc[i+1] - data[&#39;bg&#39;][&#39;Mean&#39;].iloc[i]
+        derivs.append(dbg/float(INTERVAL))
+    # just add a zero at the end since we calculated derivative forward
+    derivs.append(0) 
+    return pd.DataFrame(derivs, index=data[&#39;index&#39;], columns=[&#39;Derivative&#39;])
+
+def bg_deriv_hist(df, bins):
+    &#39;&#39;&#39;
+    Save a histogram of the blood glucose derivatives to disk.
+
+    Parameters
+    ----------
+    df: pandas DataFrame
+        dataframe
+    bins: list of int
+        List of integers representing bin boundaries
+
+    Returns
+    -------
+    None
+    &#39;&#39;&#39;
+    data = h_get_bg_derivative(df)
+    fig = plt.figure(figsize=(10,10))
+    gs = gridspec.GridSpec(1,1)
+    #   subplot areas
+    bg_deriv = plt.subplot(gs[:,:])
+    bg_deriv.set_title(&#34;Glucose Derivative by Count&#34;)
+    counts = pd.cut(data[&#39;Derivative&#39;], bins=bins).value_counts(sort=False)
+    x = counts.index.values.astype(str)
+    y = counts/counts.sum() * 100
+
+    bg_deriv.grid(axis=&#39;y&#39;, which=&#39;both&#39;)
+    bg_deriv.bar(x,y,width=0.95)
+    bg_deriv.set_title(&#34;Glucose Derivative by Count&#34;)
+    bg_deriv.set_ylabel(&#34;Percentage of vals in range&#34;)
+    bg_deriv.yaxis.set_major_formatter(mtick.PercentFormatter())
+    bg_deriv.set_xlabel(&#34;Range&#34;)
+    for label in bg_deriv.xaxis.get_ticklabels():
+        label.set_rotation(90)
+    plt.savefig(
+        &#39;./results/&#39; + FRIENDLY_DATE_STR + &#39;-bg_deriv_counts.png&#39;, 
+        dpi=DPI, 
+        transparent=False)
+    plt.close(fig)
+
+def bg_counts(df, bins):
+    &#39;&#39;&#39;
+    Parameters
+    ---------
+    df: pandas DataFrame
+        dataframe
+    bins: list of int
+        List of integers representing bin boundaries
+    
+    Returns
+    -------
+    None
+    &#39;&#39;&#39;
+    counts = pd.cut(df.loc(axis=1)[:,:,&#39;BG&#39;].unstack(), bins=bins).value_counts(sort=False)
+    x = counts.index.values.astype(str) # labels
+    y = counts / counts.sum() * 100
+
+    fig = plt.figure(figsize=(10,10))
+    gs = gridspec.GridSpec(1,1)
+    bg_counts = plt.subplot(gs[:,:])
+    bg_counts.grid(axis=&#39;y&#39;, which=&#39;both&#39;)
+    bg_counts.bar(x,y,width=0.95)
+    bg_counts.set_title(&#34;Glucose Values by Count&#34;)
+    bg_counts.set_ylabel(&#34;Percentage of vals in range&#34;)
+    bg_counts.yaxis.set_major_formatter(mtick.PercentFormatter())
+    bg_counts.set_xlabel(&#34;Range&#34;)
+    for label in bg_counts.xaxis.get_ticklabels():
+        label.set_rotation(90)
+    plt.savefig(
+        &#39;./results/&#39; + FRIENDLY_DATE_STR + &#39;-bg_counts.png&#39;, 
+        dpi=DPI, 
+        transparent=False)
+    plt.close(fig)
+
+def h_gen_poincare_df(df, sample_delta, sample_interval):
+    &#39;&#39;&#39;
+    Generate a dataframe containing blood glucose at time t, and blood glucose at time t+1, indexed by t.
+    &#39;&#39;&#39;
+    bg_means = h_ts_collected(df)[&#39;bg&#39;][&#39;Mean&#39;]
+    no_samples = len(bg_means.index.values)
+    bg_t1 = [bg_means[i+sample_delta] for i in range(0, no_samples - sample_delta)]
+    bg_t = [bg_means[i] for i in range(0, no_samples - sample_delta)]
+    indices = [i for i in bg_means.index.values[:(no_samples - sample_delta)]]
+    delta_col_name = str(&#39;t_&#39; + sample_delta)
+    return pd.DataFrame([bg_t, bg_t1], index=indices, columns=[&#39;t_0&#39;, &#39;t_&#39; + str(sample_delta)])
+
+if __name__ == &#39;__main__&#39;:
+    df = pd.read_pickle(&#34;./results/adults_1-8_x40.bz2&#34;)
+    rand_pt_bg_ts(df)
+    bg_ts(df)
+    deriv_bins = [x for x in h_gen_bg_bins(.25, -4, 4)]
+    bins = [x for x in h_gen_bg_bins(20, 20, 400)]
+    bg_counts(df, bins)
+    bg_deriv_hist(df, deriv_bins)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="uci_apc.analysis.bg_counts"><code class="name flex">
+<span>def <span class="ident">bg_counts</span></span>(<span>df, bins)</span>
+</code></dt>
+<dd>
+<div class="desc"><h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>pandas DataFrame</code></dt>
+<dd>dataframe</dd>
+<dt><strong><code>bins</code></strong> :&ensp;<code>list</code> of <code>int</code></dt>
+<dd>List of integers representing bin boundaries</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def bg_counts(df, bins):
+    &#39;&#39;&#39;
+    Parameters
+    ---------
+    df: pandas DataFrame
+        dataframe
+    bins: list of int
+        List of integers representing bin boundaries
+    
+    Returns
+    -------
+    None
+    &#39;&#39;&#39;
+    counts = pd.cut(df.loc(axis=1)[:,:,&#39;BG&#39;].unstack(), bins=bins).value_counts(sort=False)
+    x = counts.index.values.astype(str) # labels
+    y = counts / counts.sum() * 100
+
+    fig = plt.figure(figsize=(10,10))
+    gs = gridspec.GridSpec(1,1)
+    bg_counts = plt.subplot(gs[:,:])
+    bg_counts.grid(axis=&#39;y&#39;, which=&#39;both&#39;)
+    bg_counts.bar(x,y,width=0.95)
+    bg_counts.set_title(&#34;Glucose Values by Count&#34;)
+    bg_counts.set_ylabel(&#34;Percentage of vals in range&#34;)
+    bg_counts.yaxis.set_major_formatter(mtick.PercentFormatter())
+    bg_counts.set_xlabel(&#34;Range&#34;)
+    for label in bg_counts.xaxis.get_ticklabels():
+        label.set_rotation(90)
+    plt.savefig(
+        &#39;./results/&#39; + FRIENDLY_DATE_STR + &#39;-bg_counts.png&#39;, 
+        dpi=DPI, 
+        transparent=False)
+    plt.close(fig)</code></pre>
+</details>
+</dd>
+<dt id="uci_apc.analysis.bg_deriv_hist"><code class="name flex">
+<span>def <span class="ident">bg_deriv_hist</span></span>(<span>df, bins)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Save a histogram of the blood glucose derivatives to disk.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>pandas DataFrame</code></dt>
+<dd>dataframe</dd>
+<dt><strong><code>bins</code></strong> :&ensp;<code>list</code> of <code>int</code></dt>
+<dd>List of integers representing bin boundaries</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def bg_deriv_hist(df, bins):
+    &#39;&#39;&#39;
+    Save a histogram of the blood glucose derivatives to disk.
+
+    Parameters
+    ----------
+    df: pandas DataFrame
+        dataframe
+    bins: list of int
+        List of integers representing bin boundaries
+
+    Returns
+    -------
+    None
+    &#39;&#39;&#39;
+    data = h_get_bg_derivative(df)
+    fig = plt.figure(figsize=(10,10))
+    gs = gridspec.GridSpec(1,1)
+    #   subplot areas
+    bg_deriv = plt.subplot(gs[:,:])
+    bg_deriv.set_title(&#34;Glucose Derivative by Count&#34;)
+    counts = pd.cut(data[&#39;Derivative&#39;], bins=bins).value_counts(sort=False)
+    x = counts.index.values.astype(str)
+    y = counts/counts.sum() * 100
+
+    bg_deriv.grid(axis=&#39;y&#39;, which=&#39;both&#39;)
+    bg_deriv.bar(x,y,width=0.95)
+    bg_deriv.set_title(&#34;Glucose Derivative by Count&#34;)
+    bg_deriv.set_ylabel(&#34;Percentage of vals in range&#34;)
+    bg_deriv.yaxis.set_major_formatter(mtick.PercentFormatter())
+    bg_deriv.set_xlabel(&#34;Range&#34;)
+    for label in bg_deriv.xaxis.get_ticklabels():
+        label.set_rotation(90)
+    plt.savefig(
+        &#39;./results/&#39; + FRIENDLY_DATE_STR + &#39;-bg_deriv_counts.png&#39;, 
+        dpi=DPI, 
+        transparent=False)
+    plt.close(fig)</code></pre>
+</details>
+</dd>
+<dt id="uci_apc.analysis.bg_ts"><code class="name flex">
+<span>def <span class="ident">bg_ts</span></span>(<span>df)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generate a time series plot containing blood glucose (mean, +-1 std, and max/min envelopes) and mean HBGI/LBGI for collected all patients and save to disk.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>pandas DataFrame</code></dt>
+<dd>dataframe</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def bg_ts(df):
+    &#39;&#39;&#39;
+    Generate a time series plot containing blood glucose (mean, +-1 std, and max/min envelopes) and mean HBGI/LBGI for collected all patients and save to disk.
+
+    Parameters
+    ----------
+    df: pandas DataFrame
+        dataframe
+    
+    Returns
+    -------
+    None
+    &#39;&#39;&#39;
+    # setup
+    data = h_ts_collected(df)
+    # bg plot
+    fig = plt.figure(figsize=(20,10))
+    gs = gridspec.GridSpec(6,2)
+    plt.subplots_adjust(
+        hspace=1,
+        left=.05,
+        right=.95,
+        top=.95,
+        bottom=.13)
+    #   subplot areas
+    bg_ts = plt.subplot(gs[:4,:])
+    #   plots
+    bg_ts.fill_between(data[&#34;index&#34;], data[&#34;bg&#34;][&#34;Upper Envelope&#34;], data[&#34;bg&#34;][&#34;Lower Envelope&#34;], alpha=0.08, color=&#39;blue&#39;, label=&#34;std&#34;)
+    bg_ts.plot(data[&#34;index&#34;], data[&#34;bg&#34;][&#34;Mean&#34;], label=&#34;Mean&#34;, color=&#39;blue&#39;)
+    bg_ts.plot(data[&#34;index&#34;], data[&#34;bg&#34;][&#34;Max&#34;],linestyle=&#39;--&#39;, color=&#39;mediumpurple&#39;, label=&#39;Max&#39;)
+    bg_ts.plot(data[&#34;index&#34;], data[&#34;bg&#34;][&#34;Min&#34;], linestyle=&#39;--&#39;, color=&#39;slategrey&#39;, label=&#39;Min&#39;)
+    #   grids, legend, etc.
+    bg_ts.grid(axis=&#39;x&#39;, which=&#39;both&#39;)
+    bg_ts.grid(axis=&#39;y&#39;, which=&#39;major&#39;)
+    bg_ts.xaxis.set_minor_locator(mdates.HourLocator(interval=HR_INTERVAL))
+    bg_ts.xaxis.set_minor_formatter(mdates.DateFormatter(&#39;%H:%M\n&#39;))
+    bg_ts.xaxis.set_major_locator(mdates.DayLocator())
+    bg_ts.xaxis.set_major_formatter(mdates.DateFormatter(&#39;\n%b %d&#39;))
+    bg_ts.set_ylabel(&#39;Blood Glucose (mg/dl)&#39;)
+    bg_ts.axhspan(ymin=GOOD_CONTROL_LOWER, ymax=GOOD_CONTROL_UPPER, color=&#39;green&#39;, alpha=0.08)
+    bg_ts.legend()
+    # indicator plot
+    #   subplot area
+    indicators_ts = plt.subplot(gs[4:,:])
+    #   plots
+    indicators_ts.plot(data[&#34;index&#34;], data[&#34;HBGI&#34;][&#34;Mean&#34;], label=&#34;HBGI&#34;, color=&#39;steelblue&#39;)
+    indicators_ts.plot(data[&#34;index&#34;], data[&#34;LBGI&#34;][&#34;Mean&#34;], label=&#34;LBGI&#34;, color=&#39;maroon&#39;)
+    #   grids, legend, etc.
+    indicators_ts.legend()
+    indicators_ts.grid(axis=&#39;x&#39;, which=&#39;both&#39;)
+    indicators_ts.xaxis.set_minor_locator(mdates.HourLocator(interval=HR_INTERVAL))
+    indicators_ts.xaxis.set_minor_formatter(mdates.DateFormatter(&#39;%H:%M\n&#39;))
+    indicators_ts.xaxis.set_major_locator(mdates.DayLocator())
+    indicators_ts.xaxis.set_major_formatter(mdates.DateFormatter(&#39;\n%b %d&#39;))
+    indicators_ts.set_ylabel(&#39;HBGI/LBGI Indicator&#39;)
+    plt.savefig(
+        &#39;./results/&#39; + FRIENDLY_DATE_STR + &#39;-collective_bg_ts.png&#39;, 
+        dpi=DPI, 
+        transparent=False)
+    plt.close(fig)</code></pre>
+</details>
+</dd>
+<dt id="uci_apc.analysis.h_gen_bg_bins"><code class="name flex">
+<span>def <span class="ident">h_gen_bg_bins</span></span>(<span>binsize, lower_lim, upper_lim)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generate an array of bins of a certain size.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>binsize</code></strong> :&ensp;<code>int</code></dt>
+<dd>The bin size, in mg/dl.</dd>
+<dt><strong><code>lower_lim</code></strong> :&ensp;<code>int</code></dt>
+<dd>The lower limit of the bins that are to be generated, in mg/dl. Not inclusive.</dd>
+<dt><strong><code>upper_lim</code></strong> :&ensp;<code>int</code></dt>
+<dd>The upper limit of the bins that are to be generated, in mg/dl. Inclusive.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>The next bin divider.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code class="python">&gt;&gt;&gt; print([x for x in h_gen_bg_bins(10, 0, 50)])
+[0,10,20,30,40,50]
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def h_gen_bg_bins(binsize, lower_lim, upper_lim):
+    &#39;&#39;&#39;
+    Generate an array of bins of a certain size.
+
+    Parameters
+    ----------
+    binsize: int
+        The bin size, in mg/dl.
+    lower_lim: int
+        The lower limit of the bins that are to be generated, in mg/dl. Not inclusive.
+    upper_lim: int
+        The upper limit of the bins that are to be generated, in mg/dl. Inclusive.
+
+    Returns
+    -------
+    int
+        The next bin divider.
+
+    Examples
+    --------
+    &gt;&gt;&gt; print([x for x in h_gen_bg_bins(10, 0, 50)])
+    [0,10,20,30,40,50]
+    &#39;&#39;&#39;
+    x = lower_lim
+    while x &lt;= upper_lim:
+        yield x
+        x +=binsize</code></pre>
+</details>
+</dd>
+<dt id="uci_apc.analysis.h_gen_poincare_df"><code class="name flex">
+<span>def <span class="ident">h_gen_poincare_df</span></span>(<span>df, sample_delta, sample_interval)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generate a dataframe containing blood glucose at time t, and blood glucose at time t+1, indexed by t.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def h_gen_poincare_df(df, sample_delta, sample_interval):
+    &#39;&#39;&#39;
+    Generate a dataframe containing blood glucose at time t, and blood glucose at time t+1, indexed by t.
+    &#39;&#39;&#39;
+    bg_means = h_ts_collected(df)[&#39;bg&#39;][&#39;Mean&#39;]
+    no_samples = len(bg_means.index.values)
+    bg_t1 = [bg_means[i+sample_delta] for i in range(0, no_samples - sample_delta)]
+    bg_t = [bg_means[i] for i in range(0, no_samples - sample_delta)]
+    indices = [i for i in bg_means.index.values[:(no_samples - sample_delta)]]
+    delta_col_name = str(&#39;t_&#39; + sample_delta)
+    return pd.DataFrame([bg_t, bg_t1], index=indices, columns=[&#39;t_0&#39;, &#39;t_&#39; + str(sample_delta)])</code></pre>
+</details>
+</dd>
+<dt id="uci_apc.analysis.h_get_bg_derivative"><code class="name flex">
+<span>def <span class="ident">h_get_bg_derivative</span></span>(<span>df)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the bg derivative as a time series.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>pandas DataFrame</code></dt>
+<dd>dataframe</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>pandas DataFrame</code></dt>
+<dd>Glucose derivative bg(t+1) - bg(t) indexed by time. Last value is zero.
+Index: datetime
+Columns: derivative</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def h_get_bg_derivative(df):
+    &#39;&#39;&#39;
+    Get the bg derivative as a time series.
+
+    Parameters
+    ----------
+    df: pandas DataFrame
+        dataframe
+
+    Returns
+    -------
+    pandas DataFrame
+        Glucose derivative bg(t+1) - bg(t) indexed by time. Last value is zero.
+        Index: datetime
+        Columns: derivative
+    &#39;&#39;&#39;
+    data = h_ts_collected(df)
+    index = len(data[&#39;bg&#39;].index.values.tolist()) - 1
+    derivs = []
+    for i in range(0, index):
+        dbg = data[&#39;bg&#39;][&#39;Mean&#39;].iloc[i+1] - data[&#39;bg&#39;][&#39;Mean&#39;].iloc[i]
+        derivs.append(dbg/float(INTERVAL))
+    # just add a zero at the end since we calculated derivative forward
+    derivs.append(0) 
+    return pd.DataFrame(derivs, index=data[&#39;index&#39;], columns=[&#39;Derivative&#39;])</code></pre>
+</details>
+</dd>
+<dt id="uci_apc.analysis.h_ts_collected"><code class="name flex">
+<span>def <span class="ident">h_ts_collected</span></span>(<span>df)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a single timeseries of collected data from multiple patients/runs.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>pandas DataFrame object</code></dt>
+<dd>dataframe</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dictionary:</code></dt>
+<dd>"index" : Series of datetime objects representing the timeseries. Type: pandas Series
+"bg" : Mean, Max, Min, Upper Env, Lower Env of blood glucose over the timeseries. Type: pandas DataFrame
+"HBGI" : Mean, Max, Min, Upper Env, Lower Env of HBGI over the timeseries. Type: pandas DataFrame
+"LBGI" : Mean, Max, Min, Upper Env, Lower Env of LBGI glucose over the timeseries. Type: pandas DataFrame</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def h_ts_collected(df):
+    &#39;&#39;&#39;
+    Create a single timeseries of collected data from multiple patients/runs.
+
+    Parameters
+    ----------
+    df: pandas DataFrame object
+        dataframe
+    
+    Returns
+    -------
+    dictionary:
+        &#34;index&#34; : Series of datetime objects representing the timeseries. Type: pandas Series
+        &#34;bg&#34; : Mean, Max, Min, Upper Env, Lower Env of blood glucose over the timeseries. Type: pandas DataFrame
+        &#34;HBGI&#34; : Mean, Max, Min, Upper Env, Lower Env of HBGI over the timeseries. Type: pandas DataFrame
+        &#34;LBGI&#34; : Mean, Max, Min, Upper Env, Lower Env of LBGI glucose over the timeseries. Type: pandas DataFrame
+    &#39;&#39;&#39;
+    bg = pd.DataFrame( {
+        &#34;Mean&#34; : df.loc(axis=1)[:,:,&#34;BG&#34;].mean(axis=1),
+        &#34;Max&#34; : df.loc(axis=1)[:,:,&#34;BG&#34;].max(axis=1),
+        &#34;Min&#34; : df.loc(axis=1)[:,:,&#34;BG&#34;].min(axis=1),
+        &#34;Upper Envelope&#34; : df.loc(axis=1)[:,:,&#34;BG&#34;].mean(axis=1) + nstd * df.loc(axis=1)[:,:,&#34;BG&#34;].std(axis=1),
+        &#34;Lower Envelope&#34; : df.loc(axis=1)[:,:,&#34;BG&#34;].mean(axis=1) - nstd * df.loc(axis=1)[:,:,&#34;BG&#34;].std(axis=1)
+        })
+    hbgi = pd.DataFrame( {
+        &#34;Mean&#34; : df.loc(axis=1)[:,:,&#34;HBGI&#34;].mean(axis=1),
+        &#34;Max&#34; : df.loc(axis=1)[:,:,&#34;HBGI&#34;].max(axis=1),
+        &#34;Min&#34; : df.loc(axis=1)[:,:,&#34;HBGI&#34;].min(axis=1),
+        &#34;Upper Envelope&#34; : df.loc(axis=1)[:,:,&#34;HBGI&#34;].mean(axis=1) + nstd * df.loc(axis=1)[:,:,&#34;HBGI&#34;].std(axis=1),
+        &#34;Lower Envelope&#34; : df.loc(axis=1)[:,:,&#34;HBGI&#34;].mean(axis=1) - nstd * df.loc(axis=1)[:,:,&#34;HBGI&#34;].std(axis=1)
+        })
+    lbgi = pd.DataFrame( {
+        &#34;Mean&#34; : df.loc(axis=1)[:,:,&#34;LBGI&#34;].mean(axis=1),
+        &#34;Max&#34; : df.loc(axis=1)[:,:,&#34;LBGI&#34;].max(axis=1),
+        &#34;Min&#34; : df.loc(axis=1)[:,:,&#34;LBGI&#34;].min(axis=1),
+        &#34;Upper Envelope&#34; : df.loc(axis=1)[:,:,&#34;LBGI&#34;].mean(axis=1) + nstd * df.loc(axis=1)[:,:,&#34;LBGI&#34;].std(axis=1),
+        &#34;Lower Envelope&#34; : df.loc(axis=1)[:,:,&#34;LBGI&#34;].mean(axis=1) - nstd * df.loc(axis=1)[:,:,&#34;LBGI&#34;].std(axis=1)
+        })
+
+    return {&#34;index&#34;: df.index, 
+            &#34;bg&#34; : bg, 
+            &#34;HBGI&#34; : hbgi,
+            &#34;LBGI&#34; : lbgi}</code></pre>
+</details>
+</dd>
+<dt id="uci_apc.analysis.h_ts_sample"><code class="name flex">
+<span>def <span class="ident">h_ts_sample</span></span>(<span>df)</span>
+</code></dt>
+<dd>
+<div class="desc"><h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>pandas DataFrame object</code></dt>
+<dd>dataframe</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>pandas DataFrame</code></dt>
+<dd>Non-MultiIndex Dataframe of timeseries data from a single patient.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def h_ts_sample(df):
+    &#39;&#39;&#39; 
+    Parameters
+    ----------
+    df: pandas DataFrame object
+        dataframe
+    
+    Returns
+    -------
+    pandas DataFrame
+        Non-MultiIndex Dataframe of timeseries data from a single patient. 
+    &#39;&#39;&#39;
+    # get set of runs, pts in cols
+    cols = df.columns.tolist()
+    run = random.choice(tuple(set([i[0] for i in cols]))) # random run
+    pt = random.choice(tuple(set([i[1] for i in cols]))) # random patient
+    # we have to transpose before we get rid of the level
+    # TODO this is an absolutely AWFUL way of doing this.
+    return (df.loc(axis=1)[run, pt,:].transpose().droplevel(1).droplevel(0).transpose(), run, pt)</code></pre>
+</details>
+</dd>
+<dt id="uci_apc.analysis.rand_pt_bg_ts"><code class="name flex">
+<span>def <span class="ident">rand_pt_bg_ts</span></span>(<span>df)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generate a blood glucose time series plot for a random patient and save to disk.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>df</code></strong> :&ensp;<code>pandas DataFrame</code></dt>
+<dd>dataframe</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>None</code></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rand_pt_bg_ts(df):
+    &#39;&#39;&#39;
+    Generate a blood glucose time series plot for a random patient and save to disk.
+
+    Parameters
+    ----------
+    df: pandas DataFrame
+        dataframe
+    
+    Returns
+    -------
+    None
+    &#39;&#39;&#39;
+    fig = plt.figure(figsize=(20,10))
+    gs = gridspec.GridSpec(6,2)
+    plt.subplots_adjust(
+        hspace=1,
+        left=.05,
+        right=.95,
+        top=.95,
+        bottom=.13)
+    pt_data = h_ts_sample(df)
+    bg_ts = plt.subplot(gs[:4,:])
+    bg_ts.plot(pt_data[0].index, pt_data[0][&#39;BG&#39;], label=&#39;Blood Glucose&#39;)
+    bg_ts.grid(axis=&#39;x&#39;, which=&#39;both&#39;)
+    bg_ts.grid(axis=&#39;y&#39;, which=&#39;major&#39;)
+    bg_ts.xaxis.set_minor_locator(mdates.HourLocator(interval=HR_INTERVAL))
+    bg_ts.xaxis.set_minor_formatter(mdates.DateFormatter(&#39;%H:%M\n&#39;))
+    bg_ts.xaxis.set_major_locator(mdates.DayLocator())
+    bg_ts.xaxis.set_major_formatter(mdates.DateFormatter(&#39;\n%b %d&#39;))
+    bg_ts.set_ylabel(&#39;Blood Glucose (mg/dl)&#39;)
+    bg_ts.axhspan(ymin=GOOD_CONTROL_LOWER, ymax=GOOD_CONTROL_UPPER, color=&#39;green&#39;, alpha=0.08)
+    bg_ts.plot(pt_data[0].index, pt_data[0][&#39;CGM&#39;], label=&#39;Insulin&#39;)
+    bg_ts.legend()
+    ins_ts = plt.subplot(gs[4:6,:])
+    ins_ts.plot(pt_data[0].index, pt_data[0][&#39;insulin&#39;])
+    ins_ts.grid(axis=&#39;x&#39;, which=&#39;both&#39;)
+    ins_ts.xaxis.set_minor_locator(mdates.HourLocator(interval=HR_INTERVAL))
+    ins_ts.xaxis.set_minor_formatter(mdates.DateFormatter(&#39;%H:%M\n&#39;))
+    ins_ts.xaxis.set_major_locator(mdates.DayLocator())
+    ins_ts.xaxis.set_major_formatter(mdates.DateFormatter(&#39;\n%b %d&#39;))
+    plt.savefig(
+        &#39;./results/&#39; + FRIENDLY_DATE_STR + &#39;-sample_bg_ts.png&#39;, 
+        dpi=DPI, 
+        transparent=False)
+    plt.close(fig)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="uci_apc" href="index.html">uci_apc</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="two-column">
+<li><code><a title="uci_apc.analysis.bg_counts" href="#uci_apc.analysis.bg_counts">bg_counts</a></code></li>
+<li><code><a title="uci_apc.analysis.bg_deriv_hist" href="#uci_apc.analysis.bg_deriv_hist">bg_deriv_hist</a></code></li>
+<li><code><a title="uci_apc.analysis.bg_ts" href="#uci_apc.analysis.bg_ts">bg_ts</a></code></li>
+<li><code><a title="uci_apc.analysis.h_gen_bg_bins" href="#uci_apc.analysis.h_gen_bg_bins">h_gen_bg_bins</a></code></li>
+<li><code><a title="uci_apc.analysis.h_gen_poincare_df" href="#uci_apc.analysis.h_gen_poincare_df">h_gen_poincare_df</a></code></li>
+<li><code><a title="uci_apc.analysis.h_get_bg_derivative" href="#uci_apc.analysis.h_get_bg_derivative">h_get_bg_derivative</a></code></li>
+<li><code><a title="uci_apc.analysis.h_ts_collected" href="#uci_apc.analysis.h_ts_collected">h_ts_collected</a></code></li>
+<li><code><a title="uci_apc.analysis.h_ts_sample" href="#uci_apc.analysis.h_ts_sample">h_ts_sample</a></code></li>
+<li><code><a title="uci_apc.analysis.rand_pt_bg_ts" href="#uci_apc.analysis.rand_pt_bg_ts">rand_pt_bg_ts</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.1</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>
