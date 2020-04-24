@@ -21,10 +21,10 @@ tags: [visualiation, progress report]
 
 #### Analysis:
 + Charts are now functionally generated, instead of scripted
-+ charts now are saved to disk individually rather than in one file
++ Charts now are saved to disk individually rather than in one file
 
 #### Package:
 + Numpy-style docstrings added
 + added requirements.txt
 
-I'm most excited about the new documentation and ~parallell~ ~processing~ that works now. We can run simulations much more accurately now.
+I'm most excited about the new documentation and ~parallell~ ~processing~ that works now. We can run simulations much much faster now.

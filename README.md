@@ -14,31 +14,14 @@ https://rland93.github.io/uciAPC/documentation/index.html
 # Installation
 
 ## Environment setup
-Clone this repository into a new directory:
+Clone this repository wherever.
 
 	git clone https://github.com/rland93/uciAPC.git
 
-Create a new virtual environment:
+Create a new [virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/) and activate it.
 
-MacOS and Linux:
-
-	python3 -m venv venv
-
-Windows:
-
-	python3 -m venv venv
-
-Activate the virtual environment:
-
-MacOS and Linux:
-
-    source venv/bin/activate
-
-On Windows:
-
-    .\venv\Scripts\activate
-
-Install dependencies from ```requirements.txt```:
+Install dependencies from ```requirements.txt```.
 
     pip install -r requirements.txt
 
+done!
