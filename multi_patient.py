@@ -1,5 +1,10 @@
+import pandas as pd
+import copy
+import pathos.pools
+import time
+import pnames
 from simglucose.patient.t1dpatient import T1DPatient
-from simglucose.simulation.sim_engine import SimObj, sim, batch_sim
+from simglucose.simulation.sim_engine import SimObj
 from simglucose.sensor.cgm import CGMSensor, CGMNoise
 from simglucose.actuator.pump import InsulinPump
 from simglucose.simulation.scenario_gen import RandomScenario
@@ -7,102 +12,127 @@ from simglucose.simulation.scenario import Action, CustomScenario
 from simglucose.simulation.env import T1DSimEnv
 from controller import PIDController
 from datetime import timedelta, datetime
-import collections
-import numpy as np
-import matplotlib as plt
-import pandas as pd
-from pandas import MultiIndex
-import copy
-import pkg_resources
 
-RANDOM_SEED = 92612
-PATIENT_PARA_FILE = pkg_resources.resource_filename(
-    'simglucose', 'params/vpatient_params.csv')
-patient_params = pd.read_csv(PATIENT_PARA_FILE)
+FRIENDLY_DATE_STR = str(datetime.strftime( datetime.now(), "%Y%m%d%H%M%S"))
 
-adolescents = ["adolescent#001",
-               "adolescent#002",
-               "adolescent#003",
-               "adolescent#004",
-               "adolescent#005",
-               "adolescent#006",
-               "adolescent#007",
-               "adolescent#008",
-               "adolescent#009",
-               "adolescent#010"]
-children = ["child#001",
-            "child#002",
-            "child#003",
-            "child#004",
-            "child#005",
-            "child#006",
-            "child#007",
-            "child#008",
-            "child#009",
-            "child#010"]
-adults =   ["adult#001",
-            "adult#002",
-            "adult#003",
-            "adult#004",
-            "adult#005",
-            "adult#006",
-            "adult#007",
-            "adult#008",
-            "adult#009",
-            "adult#010"]
+def sim(sim_object):
+    '''
+    Simulate a sim object
+
+    Parameters
+    ----------
+    sim_object: simglucose.simulation.sim_engine SimObj
+
+    Returns
+    -------
+    A pandas dataframe containing the simulation results.
+        axis=0: time, type datetime.datetime
+        axis=1: data category, type str
+    '''
+    print('simulating...')
+    sim_object.simulate()
+    return sim_object.results()
 
 
+def run_sim_PID(no_runs, patients, runtime, meals, controller_params, path):
+    '''
+    Run the simulation a single time on a list of patients with the PID controller.
+
+    Parameters
+    ----------
+    no_runs: int
+        the number of separate simulation runs.
+    patients: list of str
+        a list of patient name strings. Patient name strings can be found in the params/Quest.csv file inside simGlucose.
+    runtime: int
+        simulation time, in hours.
+    meals: (timedelta, int)
+        a tuple containing the time of meal (as referenced from simulation start) and the meal size, in grams.
+    targetBG: int
+        the target blood glucose for the controller, in mg/dl
+    lowBG: int
+        the pump suspension glucose for the controller, in mg/dl
+
+    Returns
+    -------
+    A pandas dataframe containing the simulation results.
+        axis=0: time, type datetime.datetime
+        axis=1: MultiIndex
+            level 0: data category, type str
+            level 1: patient id, type str
+            level 2: run number, type int (starts at 1)
+    '''
+    sensor = CGMSensor.withName('Dexcom')
+    pump = InsulinPump.withName('Insulet')
+    scenario = CustomScenario(start_time = datetime(2020, 1, 1, 0,0,0), scenario=meals)
+    sim_objs = []
+    keys = []
+    for run in range(0, no_runs):
+        for pname in patients:
+            sim_objs.append(SimObj(T1DSimEnv(T1DPatient.withName(pname), 
+                                sensor, 
+                                pump, 
+                                copy.deepcopy(scenario)), # because random numbers.
+                                PIDController(controller_params, pname),
+                                timedelta(hours=runtime),
+                                animate=False,
+                                path=None))
+            keys.append((run + 1, pname))
+    p_start = time.time()
+    print('Running batch simulation of {} items...'.format(len(patients * no_runs)))
+    p = pathos.pools.ProcessPool()
+    results = p.map(sim, sim_objs)
+    print('Simulation took {} seconds.'.format(time.time() - p_start))
+    return pd.concat(results, axis=1, keys=keys)
+
+def run_sim_PID_once(pname, runtime, meals, controller_params, path):
+    '''
+    Run the simulation a single time on a single patient with the PID controller.
+
+    Parameters
+    ----------
+    pname: str
+        patient name
+    runtime: int
+        simulation time, in hours.
+    meals: (timedelta, int)
+        a tuple containing the time of meal (as referenced from simulation start) and the meal size, in grams.
+    targetBG: int
+        the target blood glucose for the controller, in mg/dl
+    lowBG: int
+        the pump suspension glucose for the controller, in mg/dl
+
+    Returns
+    -------
+    A pandas dataframe containing the simulation results.
+        axis=0: time, type datetime.datetime
+        axis=1: data category, type str
+    '''
+    sensor = CGMSensor.withName('Dexcom')
+    pump = InsulinPump.withName('Insulet')
+    scenario = CustomScenario(start_time = datetime(2020, 1, 1, 0,0,0), scenario=meals)
+    obj = SimObj(T1DSimEnv(T1DPatient.withName(pname), 
+        sensor, 
+        pump, 
+        scenario),
+        PIDController(controller_params, pname),
+        timedelta(hours=runtime),
+        animate=False,
+        path=None)
+    return sim(obj)
 
 
-
-def run_sim_once(simtime, meals, patients, targetBG, lowBG):
-    run_time = timedelta(hours=simtime)
-    start_time = datetime(2020, 1, 1, 0,0,0)
-    scenario = CustomScenario(start_time = start_time, scenario=meals)
-    def build_env(pname):
-        patient = T1DPatient.withName(pname)
-        controller = PIDController(targetBG, lowBG, pname)
-        sensor = CGMSensor.withName('Dexcom')
-        pump = InsulinPump.withName('Insulet')
-        copied_scenario = copy.deepcopy(scenario)
-        env = T1DSimEnv(patient, sensor, pump, copied_scenario)
-        instance = SimObj(env, controller, run_time, path='./results', animate = False)
-        return instance
-    # run batch sim
-    results = batch_sim([build_env(pname) for pname in patients], parallel=True)
-    return pd.concat(results)
-
-def multi_run(n_runs, simtime, meals, patients, target, low):
-    frames = []
-    names = []
-    for run in range(0, n_runs):
-        siminstance = run_sim_once(simtime, meals, patients, target, low)
-        # reformat a single sim instance, time as rows, BG, CGM, etc. by patient in cols
-        BG =        siminstance.unstack(level=0).BG.transpose()
-        CGM =       siminstance.unstack(level=0).CGM.transpose()
-        CHO =       siminstance.unstack(level=0).CHO.transpose()
-        insulin =   siminstance.unstack(level=0).insulin.transpose()
-        LBGI =      siminstance.unstack(level=0).LBGI.transpose()
-        HBGI =      siminstance.unstack(level=0).HBGI.transpose()
-        Risk =      siminstance.unstack(level=0).Risk.transpose()
-        siminstance_datas  = [BG, CGM, CHO, insulin, LBGI, HBGI, Risk]
-        siminstance_labels = ["BG", "CGM", "CHO", "insulin", "LBGI", "HBGI", "Risk"]
-
-        # append run and run #
-        frames.append( pd.concat(siminstance_datas, keys=siminstance_labels) )
-        names.append( run )
-
-    return pd.concat(frames, keys=names)
-
-
-
-t = 4
-n = 2
-meals = [(timedelta(hours=2), 80)]
-twopts = ["adult#001","adult#002"]
-target = 100
-low = 60
-
-
-df = multi_run(n, t, meals, twopts, target, low)
-print(df)
+if __name__ == '__main__':
+              # (target,    low,    tau_c)
+    PIDparams = (120,       70,     100  )
+    t = 24
+    n = 40
+    meals = [(timedelta(hours=4), 80)]
+    pts = ["adult#001","adult#002", "adult#003", "adult#004", "adult#005","adult#006","adult#007", "adult#008"]
+    dfs = run_sim_PID(n, pts, t, meals, PIDparams, './results/')
+    save=False
+    if save:
+        dfs_path = str('./results/' + FRIENDLY_DATE_STR + '-dfs.csv')
+        dfs.to_csv(dfs_path)
+    dfs.to_pickle('./results/' + 'adults_1-8_x40.bz2')
+    print(dfs)

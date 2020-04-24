@@ -3,7 +3,7 @@ import pkg_resources
 import numpy as np
 import pandas as pd
 import logging
-
+import math
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ CONTROL_QUEST = pkg_resources.resource_filename(
 PATIENT_PARA_FILE = pkg_resources.resource_filename(
     'simglucose', 'params/vpatient_params.csv')
 
-class blankController(Controller):
+class BlankController(Controller):
     def __init__(self, init_state):
         self.init_state = init_state
         self.state = init_state
@@ -24,32 +24,20 @@ class blankController(Controller):
     def reset(self):
         self.state = self.init_state
 
-# A simple PID controller.
-# target = target bg
-# lower_bound = low bg boundary
-# pgain = proportional gain
-# igain = integral gain
-# igain = derivative gain
-
 class PIDController(Controller):
-    '''
-    target - target bg
-    lower_bound - lower BG bound
-    name - patient name
-    '''
-    def __init__(self, target, lower_bound, name):
+    def __init__(self, controller_params, name):
         # patient params, for setting basal
         self.quest = pd.read_csv(CONTROL_QUEST)
         self.patient_params = pd.read_csv(
             PATIENT_PARA_FILE)
-
-        # target BG, lower bound
-        self.target = target
-        self.lower_bound = lower_bound
+        
+        self.target = controller_params[0]
+        self.lower_bound = controller_params[1]
+        self.tau_c = controller_params[2]
 
         # to begin, values of bg used to calculate dxdt are set to target BG
-        self.prev1 = target
-        self.prev2 = target
+        self.prev1 = self.target
+        self.prev2 = self.target
 
         ''' basal, PID gains are set patient-to-patient'''
         if any(self.quest.Name.str.match(name)):
@@ -59,14 +47,32 @@ class PIDController(Controller):
             self.patient_basal = np.asscalar(params.u2ss.values) * self.patient_BW / 6000
             self.patient_TDI = np.asscalar(quest.TDI.values)
 
-            # The Effect of Insulin Feedback on Closed Loop Glucose Control
-            # Steil, 2011
-            self.pgain = self.patient_TDI / (self.patient_BW * 135)
-            self.igain = self.pgain * 450   # tau 1
-            self.dgain = self.pgain * 90    # tau 2
+            '''
+            Model-Based Personalization Scheme of an Artificial Pancreas for Type 1 Diabetes Applications
+            Joon Bok Lee, Eyal Dassau, Senior Member, IEEE, Dale E. Seborg, Member, IEEE, and Francis J. Doyle III*, Fellow, IEEE
+            2013 American Control Conference (ACC) Washington, DC, USA, June 17-19, 2013
+            '''
+            s_fb = 0.5 * self.patient_TDI / 24  # (6)
+            c = .0664                           # (5)
+            '''
+            Guidelines for Optimal Bolus Calculator Settings in Adults
+            John Walsh, P.A., Ruth Roberts, M.A.,2 and Timothy Bailey, M.D., FACE, C.P.I.1
+            J Diabetes Sci Technol. 2011 Jan; 5(1): 129–135. 
+            '''
+            k_i = 1960 / self.patient_TDI       # (3),(4)
+            K = k_i * c * s_fb                  # (2)
+            tau_1 = 247                         # (13)
+            tau_2 = 210                         # (14)
+            theta = 93.5                        # (12)
+
+            self.k_c = 2 * self.patient_basal * 298/((self.tau_c + 93.5)*1960*.5)            # (22) --> Proportional Gain
+            print("k_c: {}".format(self.k_c))
+            self.tau_i = 458               # (20) --> Integral Gain
+            self.tau_d = 113               # (21) --> Derivative Gain
+
         else:
-            raise LookupError("Patient name or ID not in Quest or Params")
-        # integral error
+            raise LookupError("Invalid patient name.")
+
         self.ierror = 0
 
 
@@ -77,37 +83,24 @@ class PIDController(Controller):
             pname,
             observation.CGM,
             self.prev1, 
-            self.prev2,
             sample_time)
 
-        # store previous glucose readings for calculating derivative
-        self.prev2 = self.prev1
+        # for the derivative
         self.prev1 = observation.CGM
         return action
 
-    # name = patient name (for lookup)
-    # glucose = cgm level in current interval
-    # env_sample_time = time between samples
-    def _policy(self, name, glucose, prev1, prev2, env_sample_time):
-        '''proportional term'''
-        # scale error to units of insulin according to correction factor
-        pterm = np.asscalar((glucose - self.target))
-        '''integral term'''
-        # increment integral error
-        self.ierror += glucose - self.target
-        '''derivative term'''
-        # unit is mg/dl per minute
-        dterm = (glucose + prev1 + prev2) / 3 / env_sample_time
-        '''set bolus'''
-        bolus = pterm * self.pgain + self.ierror * self.igain + dterm * self.dgain
-        # cannot have negative bolus
-        if bolus < 0:
-            bolus = 0
 
-        # if bg falls below a lower bound, suspend all insulin delivery
-        if glucose < self.lower_bound:
-            bolus = 0
-            basal = 0
+    def _policy(self, pname, glucose, prev1, env_sample_time):
+        error = np.asscalar((glucose - self.target))    # error
+        self.ierror += error                            # integral error
+        deriv = (glucose - prev1) / env_sample_time     # derivative
 
-        bolus = bolus / env_sample_time
-        return Action(basal=self.patient_basal, bolus=bolus)
+        pterm = self.k_c * error
+        iterm = self.k_c / self.tau_i * self.ierror
+        dterm = self.k_c * self.tau_d * deriv
+
+        bolus = pterm + iterm + dterm
+        basal = self.patient_basal
+        if bolus + basal < 0:
+            bolus = -1 * basal
+        return Action(basal=basal, bolus=bolus)
