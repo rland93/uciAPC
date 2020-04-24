@@ -13,7 +13,7 @@ Spring 2020 Team members:
 Alumni:
 + Ashutosh Shah (W20)
 
-Documentation of the project is available <a href="{{ site.baseurl  }}/documentation/index.html">here</a>.
+Documentation of the project is available <a href="{{ site.baseurl  }}/documentation/index.html">here</a>. Most documentation is written inline with the code.
 
 ---
 
