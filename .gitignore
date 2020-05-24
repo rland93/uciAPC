@@ -1,3 +1,4 @@
-uci_apc/__pycache__*
-uci_apc/results*
-venv*
+uci_apc/src/__pycache__*
+uci_apc/src/results*
+uci_apc/src/venv*
+uci_apc/dfs/*
