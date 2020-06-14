@@ -2,6 +2,7 @@ import pandas as pd
 import copy
 import pathos.pools
 import time
+import controller
 from simglucose.patient.t1dpatient import T1DPatient
 from simglucose.simulation.sim_engine import SimObj
 from simglucose.sensor.cgm import CGMSensor, CGMNoise
@@ -9,8 +10,14 @@ from simglucose.actuator.pump import InsulinPump
 from simglucose.simulation.scenario_gen import RandomScenario
 from simglucose.simulation.scenario import Action, CustomScenario
 from simglucose.simulation.env import T1DSimEnv
-from uci_apc.controller import PIDController
 from datetime import timedelta, datetime
+import sys
+
+if __name__ == 'main':
+    print(sys.path)
+
+# from controller import PIDController
+
 
 FRIENDLY_DATE_STR = str(datetime.strftime( datetime.now(), "%Y%m%d%H%M%S"))
 
@@ -33,7 +40,7 @@ def sim(sim_object):
     return sim_object.results()
 
 
-def run_sim_PID(no_runs, patients, runtime, meals, controller_params, path):
+def run_sim_PID(no_runs, patients, runtime, meals, controller_params):
     '''
     Run the simulation a single time on a list of patients with the PID controller.
 
@@ -72,7 +79,7 @@ def run_sim_PID(no_runs, patients, runtime, meals, controller_params, path):
                                 sensor, 
                                 pump, 
                                 copy.deepcopy(scenario)), # because random numbers.
-                                PIDController(controller_params, pname),
+                                controller.PIDController(controller_params, pname),
                                 timedelta(hours=runtime),
                                 animate=False,
                                 path=None))
@@ -84,7 +91,7 @@ def run_sim_PID(no_runs, patients, runtime, meals, controller_params, path):
     print('Simulation took {} seconds.'.format(time.time() - p_start))
     return pd.concat(results, axis=1, keys=keys)
 
-def run_sim_PID_once(pname, runtime, meals, controller_params, path):
+def run_sim_PID_once(pname, runtime, meals, controller_params):
     '''
     Run the simulation a single time on a single patient with the PID controller.
 
@@ -114,7 +121,7 @@ def run_sim_PID_once(pname, runtime, meals, controller_params, path):
         sensor, 
         pump, 
         scenario),
-        PIDController(controller_params, pname),
+        controller.PIDController(controller_params, pname),
         timedelta(hours=runtime),
         animate=False,
         path=None)
@@ -122,19 +129,20 @@ def run_sim_PID_once(pname, runtime, meals, controller_params, path):
 
 
 if __name__ == '__main__':
-    adolescents =   ["adolescent#001","adolescent#002","adolescent#003","adolescent#004","adolescent#005","adolescent#006","adolescent#007","adolescent#008","adolescent#009","adolescent#010"]
-    children =      ["child#001","child#002","child#003","child#004","child#005","child#006","child#007","child#008","child#009","child#010"]
-    adults =        ["adult#001","adult#002","adult#003","adult#004","adult#005","adult#006","adult#007","adult#008","adult#009","adult#010"]
-              # (target,    low,    tau_c)
-    PIDparams = (120,       70,     100  )
-    t = 24
-    n = 40
-    meals = [(timedelta(hours=4), 80)]
+    adults =        ["adult#001","adult#002","adult#003","adult#004","adult#005","adult#006","adult#007","adult#008"]
+    t = 36
+    n = 8
+    meals = [(timedelta(hours=6), 80)]
     pts = adults
-    dfs = run_sim_PID(n, adults, t, meals, PIDparams, './results/')
-    save=False
-    if save:
-        dfs_path = str('./results/' + FRIENDLY_DATE_STR + '-dfs.csv')
-        dfs.to_csv(dfs_path)
-    dfs.to_pickle('./results/' + 'adults_1-8_x40.bz2')
-    print(dfs)
+    ki = float(.00000)
+    while ki <= 0.00001:
+        ki +=.000001
+        print('kp=' + str(ki))
+        #           (kp, ki, kd, target, low)
+        PIDparams = (0.00025, round(ki, 7), 0, 120, 70)
+
+        dfs = run_sim_PID(n, adults, t, meals, PIDparams)
+
+        filename = 'dfs/' + 'p_' + str(PIDparams[0]) + ' i_' + str(PIDparams[1]) + ' d_' + str(PIDparams[2]) + ' target_' + str(PIDparams[3]) + '.bz2'
+        dfs.to_pickle(filename)
+        

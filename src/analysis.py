@@ -7,6 +7,7 @@ import matplotlib.dates as mdates
 import matplotlib.gridspec as gridspec
 import matplotlib.ticker as mtick
 import datetime
+from os import walk
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
@@ -128,7 +129,7 @@ def h_gen_bg_bins(binsize, lower_lim, upper_lim):
         yield x
         x +=binsize
 
-def rand_pt_bg_ts(df):
+def rand_pt_bg_ts(df, path):
     '''
     Generate a blood glucose time series plot for a random patient and save to disk.
 
@@ -170,12 +171,12 @@ def rand_pt_bg_ts(df):
     ins_ts.xaxis.set_major_locator(mdates.DayLocator())
     ins_ts.xaxis.set_major_formatter(mdates.DateFormatter('\n%b %d'))
     plt.savefig(
-        './results/' + FRIENDLY_DATE_STR + '-sample_bg_ts.png', 
+        path + '-rand_pt_ts.png', 
         dpi=DPI, 
         transparent=False)
     plt.close(fig)
 
-def bg_ts(df):
+def bg_ts(df, path):
     '''
     Generate a time series plot containing blood glucose (mean, +-1 std, and max/min envelopes) and mean HBGI/LBGI for collected all patients and save to disk.
 
@@ -231,7 +232,7 @@ def bg_ts(df):
     indicators_ts.xaxis.set_major_formatter(mdates.DateFormatter('\n%b %d'))
     indicators_ts.set_ylabel('HBGI/LBGI Indicator')
     plt.savefig(
-        './results/' + FRIENDLY_DATE_STR + '-collective_bg_ts.png', 
+        path + '-bg_ts.png', 
         dpi=DPI, 
         transparent=False)
     plt.close(fig)
@@ -262,7 +263,7 @@ def h_get_bg_derivative(df):
     derivs.append(0) 
     return pd.DataFrame(derivs, index=data['index'], columns=['Derivative'])
 
-def bg_deriv_hist(df, bins):
+def bg_deriv_hist(df, bins, path):
     '''
     Save a histogram of the blood glucose derivatives to disk.
 
@@ -296,12 +297,12 @@ def bg_deriv_hist(df, bins):
     for label in bg_deriv.xaxis.get_ticklabels():
         label.set_rotation(90)
     plt.savefig(
-        './results/' + FRIENDLY_DATE_STR + '-bg_deriv_counts.png', 
+        path + 'bg_deriv_hist.png', 
         dpi=DPI, 
         transparent=False)
     plt.close(fig)
 
-def bg_counts(df, bins):
+def bg_counts(df, bins, path):
     '''
     Parameters
     ---------
@@ -330,7 +331,7 @@ def bg_counts(df, bins):
     for label in bg_counts.xaxis.get_ticklabels():
         label.set_rotation(90)
     plt.savefig(
-        './results/' + FRIENDLY_DATE_STR + '-bg_counts.png', 
+        path + '-bg_counts.png', 
         dpi=DPI, 
         transparent=False)
     plt.close(fig)
@@ -347,11 +348,39 @@ def h_gen_poincare_df(df, sample_delta, sample_interval):
     delta_col_name = str('t_' + sample_delta)
     return pd.DataFrame([bg_t, bg_t1], index=indices, columns=['t_0', 't_' + str(sample_delta)])
 
+
+def tabulate(df, low, high, save):
+    '''
+    Generate a table of useful numerical measures of controller performance. The range specified by params low and high is the euglycemic range.
+
+    Parameters
+    ----------
+    df: pandas DataFrame
+    low: int
+        The limit of low blood glucose
+    high: int
+        The limit of high blood glucose
+    '''
+    bgs = df[:,:,"BG"]
+    print(bgs)
+    # Time in percentage
+    # No. of simulations with BG by bin
+    # CVGA zone count
+    # mean, max, min, std
+    # LBGI mean, max, min, std
+    # Total insulin dose (mean)
+
+
+
+
 if __name__ == '__main__':
-    df = pd.read_pickle("./results/adults_1-8_x40.bz2")
-    rand_pt_bg_ts(df)
-    bg_ts(df)
-    deriv_bins = [x for x in h_gen_bg_bins(.25, -4, 4)]
-    bins = [x for x in h_gen_bg_bins(20, 20, 400)]
-    bg_counts(df, bins)
-    bg_deriv_hist(df, deriv_bins)
+    dfs = []
+    # get filenames of dataframes
+    for (dirpath, dirnames, filenames) in walk('./dfs/'):
+        dfs.extend(filenames)
+    for df in dfs:
+        data = pd.read_pickle('./dfs/' + df)
+        figname = df[:-4]
+        bg_ts(data, './results/' + figname)
+        # bins = [x for x in h_gen_bg_bins(40,20,400)]
+        # bg_counts(data, bins, './results/' + figname)
