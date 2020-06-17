@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Towards Model Predictive Control"
+title:  "Towards Model Predictive Control, Part 1"
 author: Mike
 date:   2020-06-13
 categories: update
@@ -86,7 +86,7 @@ We plot the results, and we can see that the controller has developed the optima
 
 Top is the blood glucose response and the bottom is the controller response.
 
-![Bmatrix]({{ "mpc-6-13/controller.png" | absolute_url  }})
+![Controller]({{ "mpc-6-13/controller.png" | absolute_url  }})
 
 We would then take the first step, ```u[:,0]```, as our next controller action, and repeat the process at the next control step.
 
