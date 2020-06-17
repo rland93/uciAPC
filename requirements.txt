@@ -1,13 +1,17 @@
 certifi==2020.4.5.1
 chardet==3.0.4
+cvxpy==1.1.1
 cycler==0.10.0
 dill==0.3.1.1
+ecos==2.0.7.post1
+future==0.18.2
 gym==0.9.4
 idna==2.9
 kiwisolver==1.2.0
 matplotlib==3.2.1
 multiprocess==0.70.9
 numpy==1.18.3
+osqp==0.6.1
 pandas==1.0.3
 pathos==0.2.5
 pox==0.2.7
@@ -18,6 +22,7 @@ python-dateutil==2.8.1
 pytz==2019.3
 requests==2.23.0
 scipy==1.4.1
+scs==2.1.2
 simglucose==0.2.1
 six==1.14.0
 urllib3==1.25.9

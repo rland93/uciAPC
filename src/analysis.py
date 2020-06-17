@@ -36,6 +36,8 @@ CHO_COLOR = 'crimson'
 
 
 
+
+
 # collected timeseries
 def h_ts_collected(df):
     '''
@@ -175,6 +177,54 @@ def rand_pt_bg_ts(df, path):
         dpi=DPI, 
         transparent=False)
     plt.close(fig)
+
+def single_pt_ts(df, path):
+    '''
+    Generate a blood glucose time series plot for a single patient and save to disk.
+
+    Parameters
+    ----------
+    df: pandas DataFrame (SINGLE PATIENT!)
+        dataframe
+    
+    Returns
+    -------
+    None
+    '''
+    fig = plt.figure(figsize=(20,10))
+    gs = gridspec.GridSpec(6,2)
+    plt.subplots_adjust(
+        hspace=1,
+        left=.05,
+        right=.95,
+        top=.95,
+        bottom=.13)
+    bg_ts = plt.subplot(gs[:4,:])
+    bg_ts.plot(df.index, df['BG'], label='Blood Glucose')
+    bg_ts.grid(axis='x', which='both')
+    bg_ts.grid(axis='y', which='major')
+    bg_ts.xaxis.set_minor_locator(mdates.HourLocator(interval=HR_INTERVAL))
+    bg_ts.xaxis.set_minor_formatter(mdates.DateFormatter('%H:%M\n'))
+    bg_ts.xaxis.set_major_locator(mdates.DayLocator())
+    bg_ts.xaxis.set_major_formatter(mdates.DateFormatter('\n%b %d'))
+    bg_ts.set_ylabel('Blood Glucose (mg/dl)')
+    bg_ts.axhspan(ymin=GOOD_CONTROL_LOWER, ymax=GOOD_CONTROL_UPPER, color='green', alpha=0.08)
+    bg_ts.plot(df.index, df['CGM'], label='CGM')
+    bg_ts.legend()
+    ins_ts = plt.subplot(gs[4:6,:])
+    ins_ts.step(df.index, df['insulin'])
+    ins_ts.grid(axis='x', which='both')
+    ins_ts.xaxis.set_minor_locator(mdates.HourLocator(interval=HR_INTERVAL))
+    ins_ts.xaxis.set_minor_formatter(mdates.DateFormatter('%H:%M\n'))
+    ins_ts.xaxis.set_major_locator(mdates.DayLocator())
+    ins_ts.xaxis.set_major_formatter(mdates.DateFormatter('\n%b %d'))
+    plt.savefig(
+        path + '-rand_pt_ts.png', 
+        dpi=DPI, 
+        transparent=False)
+    plt.close(fig)
+
+
 
 def bg_ts(df, path):
     '''
@@ -375,6 +425,11 @@ def tabulate(df, low, high, save):
 
 if __name__ == '__main__':
     dfs = []
+
+    fname = './src/dfs/mpc_test.bz2'
+    data = pd.read_pickle(fname)
+    single_pt_ts(data, 'fig.png')
+    '''
     # get filenames of dataframes
     for (dirpath, dirnames, filenames) in walk('./dfs/'):
         dfs.extend(filenames)
@@ -382,5 +437,6 @@ if __name__ == '__main__':
         data = pd.read_pickle('./dfs/' + df)
         figname = df[:-4]
         bg_ts(data, './results/' + figname)
-        # bins = [x for x in h_gen_bg_bins(40,20,400)]
-        # bg_counts(data, bins, './results/' + figname)
+        bins = [x for x in h_gen_bg_bins(40,20,400)]
+        bg_counts(data, bins, './results/' + figname)
+    '''

@@ -5,8 +5,8 @@ import pandas as pd
 import logging
 import math
 import cvxpy as cp
-
-logger = logging.getLogger(__name__)
+import logging
+logging.basicConfig(filename='MPC_Controller.log',level=logging.DEBUG,format='%(asctime)s %(message)s')
 
 # Patient Data
 CONTROL_QUEST = pkg_resources.resource_filename(
@@ -94,16 +94,106 @@ class TunedPIDController(Controller):
         error = np.asscalar((glucose - self.target))    # error
         self.ierror += error                            # integral error
         deriv = (glucose - prev1) / env_sample_time     # derivative
-
         pterm = self.k_c * error
         iterm = self.k_c / self.tau_i * self.ierror
         dterm = self.k_c * self.tau_d * deriv
-
         bolus = pterm + iterm + dterm
         basal = self.patient_basal
         if bolus + basal < 0:
             bolus = -1 * basal
         return Action(basal=basal, bolus=bolus)
+
+class MPCNaive(Controller):
+    '''
+    control params: tuple, (targetBG, lowBG)
+    '''
+    def __init__(self, controller_params, name):
+        self.targetBG = controller_params[0]
+        self.lowBG = controller_params[1]
+        self.patient_params = pd.read_csv(PATIENT_PARA_FILE)
+        self.quest = pd.read_csv(CONTROL_QUEST)
+        if any(self.patient_params.Name.str.match(name)):
+            params = self.patient_params[self.patient_params.Name.str.match(name)]
+            # Patient Basal
+            self.patient_basal = np.asscalar(params.u2ss.values) * np.asscalar(params.BW.values) / 6000
+        else:
+            raise KeyError("No patient with that ID exists! (pt params)")
+        if any(self.quest.Name.str.match(name)):
+            quest = self.quest[self.quest.Name.str.match(name)]
+            # Total Daily Insulin
+            self.TDI = np.asscalar(quest.TDI.values)
+        else:
+            raise KeyError("No patient with that ID exists! (pt quest)")
+        
+        # predict horizon
+        self.T = controller_params[2]
+        # control horizon
+        self.M = 10
+        # Van Heusden's Control Relevant Model
+        self.p1 = 0.98
+        self.p2 = 0.965
+        self.g = -90 * (1-self.p1)*(1-self.p2)*(1-self.p2)
+        # A matrix used to calculate state from previous states
+        self.A = np.array([   
+                [self.p1+2*self.p2, -2*self.p1*self.p2-self.p2*self.p2, self.p1*self.p2*self.p2],
+                [1,0,0],
+                [0,1,0]])
+        # B matrix used to calculate effect of control inputs on state
+        self.B = 1800 * self.g / self.TDI * np.array([[1],[0],[0]])
+        # "known" state is 3 vals behind current state
+        self.C = np.array([0,0,1])
+        self.state = 0
+        self.prev_doses = []
+
+    def policy(self, observation, reward, done, **kwargs):
+        ''' define vars and solve optimization problem '''
+        self.state = np.asscalar(observation.CGM)
+
+        '''list of previous doses'''
+        self.prev_doses.append()
+
+
+
+        # state var
+        x = cp.Variable((3, self.T+1))
+        u = cp.Variable((1, self.T))
+        # init cost and constraints
+        cost = 0
+        constraints = []
+        # build costs, constraints across horizon
+        for t in range(self.T):
+            # quadratic cost away from target
+            cost += cp.sum_squares(x[:,t] - self.targetBG) + cp.sum_squares(u[:,t])
+            constraints += [
+                x[:,t+1] == self.A @ x[:,t] + self.B @ u[:,t], # state dependence
+                u[:,t] >= 0,    # dose is non-negative
+                u[:,t] <= 1.0,  # single dose cannot be larger than 1u
+                u[:,self.M:self.T] == 0 # no control action beyond control horizon
+            ]
+        # we add the constraint that we are starting from the observation.
+        constraints += [
+            x[:,0] == self.state
+        ]
+        # solve problem
+        problem = cp.Problem(cp.Minimize(cost), constraints)
+        problem.solve(solver='ECOS')
+
+        '''logging'''
+        logging.debug("Start BG: {}".format(self.state))
+        logging.debug("Problem Status: {}".format(problem.status))
+        logging.debug("\tSetup Time: {}".format(problem.solver_stats.setup_time))
+        logging.debug("\tSolved in: {}".format(problem.solver_stats.solve_time))
+        logging.debug("\tNumber of iterations: {}".format(problem.solver_stats.num_iters))
+
+        if self.state >= self.lowBG:
+            # take only first control action
+            bolus = u.value[0,1]
+            basal = self.patient_basal
+        else:
+            bolus = 0
+            basal = 0
+        return Action(basal=basal, bolus=bolus)
+
 
 class PIDController(Controller):
     '''

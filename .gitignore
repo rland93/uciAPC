@@ -1,3 +1,5 @@
 src/dfs/*
 venv/*
 .vscode/*
+*.log
+src/__pycache__
