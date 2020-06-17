@@ -12,6 +12,9 @@ from simglucose.simulation.scenario import Action, CustomScenario
 from simglucose.simulation.env import T1DSimEnv
 from datetime import timedelta, datetime
 import sys
+import logging
+logging.basicConfig(filename='MPC_Controller.log',level=logging.DEBUG,format='%(asctime)s %(message)s')
+
 
 if __name__ == 'main':
     print(sys.path)
@@ -129,6 +132,7 @@ def run_sim_PID_once(pname, runtime, meals, controller_params):
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     adults =        ["adult#001","adult#002","adult#003","adult#004","adult#005","adult#006","adult#007","adult#008"]
     t = 36
     n = 8
@@ -145,4 +149,31 @@ if __name__ == '__main__':
 
         filename = 'dfs/' + 'p_' + str(PIDparams[0]) + ' i_' + str(PIDparams[1]) + ' d_' + str(PIDparams[2]) + ' target_' + str(PIDparams[3]) + '.bz2'
         dfs.to_pickle(filename)
+=======
+    pname = "adult#001"
+    t = 9
+    meals = [(timedelta(hours=2), 50)]
+    sensor = CGMSensor.withName('Dexcom')
+    pump = InsulinPump.withName('Insulet')
+    scenario = CustomScenario(start_time = datetime(2020, 1, 1, 0,0,0), scenario=meals)
+    keys = []
+    # forward horizon
+    horizon = 50
+    controller_params = (140, 80, horizon)
+    obj= SimObj(T1DSimEnv(T1DPatient.withName(pname), 
+                        sensor, 
+                        pump, 
+                        copy.deepcopy(scenario)), # because random numbers.
+                        controller.MPCNaive(controller_params, pname),
+                        timedelta(hours=t),
+                        animate=False,
+                        path=None)
+    keys.append((1, pname))
+    p_start = time.time()
+    results = sim(obj)
+    print('Simulation took {} seconds.'.format(time.time() - p_start))
+    dfs = results
+    filename = 'mpc_test.bz2'
+    dfs.to_pickle(filename)
+>>>>>>> MPC-exploration
         
