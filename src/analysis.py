@@ -11,6 +11,12 @@ from os import walk
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
+'''
+note:
+functions beginning with h_ are 'helper' functions, they help to generate the plots.
+'''
+
+
 # path to save figures
 FRIENDLY_DATE_STR = str(datetime.datetime.strftime( datetime.datetime.now(), "%Y%m%d%H%M%S"))
 DPI = 300
@@ -131,7 +137,7 @@ def h_gen_bg_bins(binsize, lower_lim, upper_lim):
         yield x
         x +=binsize
 
-def rand_pt_bg_ts(df, path):
+def rand_pt_bg_ts(df, save=False, path='./results/'):
     '''
     Generate a blood glucose time series plot for a random patient and save to disk.
 
@@ -172,13 +178,14 @@ def rand_pt_bg_ts(df, path):
     ins_ts.xaxis.set_minor_formatter(mdates.DateFormatter('%H:%M\n'))
     ins_ts.xaxis.set_major_locator(mdates.DayLocator())
     ins_ts.xaxis.set_major_formatter(mdates.DateFormatter('\n%b %d'))
-    plt.savefig(
-        path + '-rand_pt_ts.png', 
-        dpi=DPI, 
-        transparent=False)
-    plt.close(fig)
+    if save:
+        plt.savefig(
+            path + '-rand_pt_ts.png', 
+            dpi=DPI, 
+            transparent=False)
+    return fig
 
-def single_pt_ts(df, path):
+def single_pt_ts(df, save=False, path="./results/"):
     '''
     Generate a blood glucose time series plot for a single patient and save to disk.
 
@@ -218,15 +225,16 @@ def single_pt_ts(df, path):
     ins_ts.xaxis.set_minor_formatter(mdates.DateFormatter('%H:%M\n'))
     ins_ts.xaxis.set_major_locator(mdates.DayLocator())
     ins_ts.xaxis.set_major_formatter(mdates.DateFormatter('\n%b %d'))
-    plt.savefig(
-        path + '-rand_pt_ts.png', 
-        dpi=DPI, 
-        transparent=False)
-    plt.close(fig)
+    if save:
+        plt.savefig(
+            path + '-rand_pt_ts.png', 
+            dpi=DPI, 
+            transparent=False)
+    return fig
 
 
 
-def bg_ts(df, path):
+def bg_ts(df, save=False, path='./results'):
     '''
     Generate a time series plot containing blood glucose (mean, +-1 std, and max/min envelopes) and mean HBGI/LBGI for collected all patients and save to disk.
 
@@ -281,11 +289,12 @@ def bg_ts(df, path):
     indicators_ts.xaxis.set_major_locator(mdates.DayLocator())
     indicators_ts.xaxis.set_major_formatter(mdates.DateFormatter('\n%b %d'))
     indicators_ts.set_ylabel('HBGI/LBGI Indicator')
-    plt.savefig(
-        path + '-bg_ts.png', 
-        dpi=DPI, 
-        transparent=False)
-    plt.close(fig)
+    if save:
+        plt.savefig(
+            path + '-bg_ts.png', 
+            dpi=DPI, 
+            transparent=False)
+    return fig
     
 def h_get_bg_derivative(df):
     '''
@@ -352,7 +361,7 @@ def bg_deriv_hist(df, bins, path):
         transparent=False)
     plt.close(fig)
 
-def bg_counts(df, bins, path):
+def bg_counts(df, bins, save=False, path='./results/'):
     '''
     Parameters
     ---------
@@ -380,11 +389,12 @@ def bg_counts(df, bins, path):
     bg_counts.set_xlabel("Range")
     for label in bg_counts.xaxis.get_ticklabels():
         label.set_rotation(90)
-    plt.savefig(
-        path + '-bg_counts.png', 
-        dpi=DPI, 
-        transparent=False)
-    plt.close(fig)
+    if save:
+        plt.savefig(
+            path + '-bg_counts.png', 
+            dpi=DPI, 
+            transparent=False)
+    return fig
 
 def h_gen_poincare_df(df, sample_delta, sample_interval):
     '''
