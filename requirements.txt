@@ -10,7 +10,7 @@ idna==2.9
 kiwisolver==1.2.0
 matplotlib==3.2.1
 multiprocess==0.70.9
-numpy==1.18.3
+numpy==1.22.0
 osqp==0.6.1
 pandas==1.0.3
 pathos==0.2.5
